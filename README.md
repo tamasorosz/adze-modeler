@@ -5,6 +5,8 @@
 [build-status-image]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
 [travis]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
 [![codecov](https://codecov.io/gh/tamasorosz/artap-segment/branch/main/graph/badge.svg?token=zH6pBqqnid)](https://codecov.io/gh/tamasorosz/artap-segment)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/context:python)
 
 SimplE GeoMetry gENeraTion for fem-based optimization
 
