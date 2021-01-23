@@ -8,6 +8,8 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/context:python)
 
+[![Code Style](https://badgen.net/badge/Code%20Style/black?labelColor=2e3a44&color=000000)](https://github.com/psf/black)
+
 SimplE GeoMetry gENeraTion for fem-based optimization
 
 A FEM-based optimization needs a parametrized geometry for the mesh generation. The goal of this project to provide a 
