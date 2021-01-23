@@ -8,9 +8,11 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/tamasorosz/artap-segment.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tamasorosz/artap-segment/context:python)
 
+[![License](https://badgen.net/github/license/tamasorosz/artap-segment?labelColor=2e3a44&label=License)](https://github.com/tamasorosz/artap-segment/master/LICENSE)
 [![Code Style](https://badgen.net/badge/Code%20Style/black?labelColor=2e3a44&color=000000)](https://github.com/psf/black)
 
-SimplE GeoMetry gENeraTion for fem-based optimization
+
+## SimplE GeoMetry gENeraTion for fem-based optimization
 
 A FEM-based optimization needs a parametrized geometry for the mesh generation. The goal of this project to provide a 
 simple set of objects and entities for geometry generation. The defined geometry can be exported for many FEM codes scripting files or svg, dxf formats. 

@@ -1,5 +1,6 @@
 from unittest import TestCase
 from artapsegment.objects import Node
+from math import pi
 
 
 class TestNodeOperations(TestCase):
@@ -8,4 +9,14 @@ class TestNodeOperations(TestCase):
         # initialize without an id number
         self.assertEqual((1., 1.), Node(1., 1.).as_tuple())
 
-        # initialize with an id number
+    def test_rotate_a_node(self):
+        a = Node(1.0, 0.0)
+        c = a.rotate(pi / 2)
+        self.assertEqual((0., 1.), c.as_tuple())
+
+    def test_rotate_node_around_a_point(self):
+        a = Node(1.0, 0.0)
+        b = Node(0.5, 0.0)
+
+        d = a.rotate_about(b, pi / 2)
+        self.assertEqual((0.5, 0.5), d.as_tuple())

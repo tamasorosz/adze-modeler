@@ -2,25 +2,17 @@ import math
 
 
 class Node:
-    """A point identified by (x,y) coordinates.
-
-    supports: +, -, *, /, str, repr
-
-    length  -- calculate length of vector to point from origin
-    distance_to  -- calculate distance between two points
-    as_tuple  -- construct tuple (x,y)
-    clone  -- construct a duplicate
-    move_to  -- reset x & y
-    slide  -- move (in place) +dx, +dy, as spec'd by point
-    slide_xy  -- move (in place) +dx, +dy
-    rotate  -- rotate around the origin
-    rotate_about  -- rotate around another point
+    """
+    A Node identified by (x,y) coordinates, optionally it can contains an id number or a label. The id_number and
+    the label can be important to rotate and copy and rotate the selected part of the geometry.
     """
 
-    def __init__(self, x=0.0, y=0.0, id=None):
+    def __init__(self, x=0.0, y=0.0, id=None, label=None, precision=6):
         self.x = x
         self.y = y
         self.id = id  # a node has to got a unique id to be translated or moved
+        self.label = label  # can be used to denote a group of the elements and make some operation with them
+        self.precision = precision  # number of the digits, every coordinate represented in the same precision
 
     def __add__(self, p):
         """Point(x1+x2, y1+y2)"""
@@ -57,30 +49,26 @@ class Node:
 
     def clone(self):
         """Return a full copy of this point."""
-        return Node(self.x, self.y)
+        return Node(self.x, self.y, self.id, self.label, self.precision)
 
-    def move_to(self, x, y):
-        """Reset x & y coordinates."""
-        self.x = x
-        self.y = y
+    # def move_to(self, x, y):
+    #    """Reset x & y coordinates."""
+    #    self.x = x
+    #    self.y = y
 
-    def slide(self, p):
+    def move(self, p):
+        """Move to new (x+dx,y+dy)."""
+        self.x = round(self.x + p.x, self.precision)
+        self.y = round(self.y + p.y, self.precision)
+
+    def move_xy(self, dx, dy):
         '''Move to new (x+dx,y+dy).
 
         Can anyone think up a better name for this function?
         slide? shift? delta? move_by?
         '''
-        self.x = self.x + p.x
-        self.y = self.y + p.y
-
-    def slide_xy(self, dx, dy):
-        '''Move to new (x+dx,y+dy).
-
-        Can anyone think up a better name for this function?
-        slide? shift? delta? move_by?
-        '''
-        self.x = self.x + dx
-        self.y = self.y + dy
+        self.x = round(self.x + dx, self.precision)
+        self.y = round(self.y + dy, self.precision)
 
     def rotate(self, rad):
         """Rotate counter-clockwise by rad radians.
@@ -95,19 +83,14 @@ class Node:
         """
         s, c = [f(rad) for f in (math.sin, math.cos)]
         x, y = (c * self.x - s * self.y, s * self.x + c * self.y)
-        return Node(x, y)
+        return Node(round(x, self.precision), round(y, self.precision))
 
     def rotate_about(self, p, theta):
-        """Rotate counter-clockwise around a point, by theta degrees.
-
-        Positive y goes *up,* as in traditional mathematics.
-
-        The new position is returned as a new Point.
-        """
+        """ Rotate counter-clockwise around a point, by theta degrees. The new position is returned as a new Point. """
         result = self.clone()
-        result.slide(-p.x, -p.y)
-        result.rotate(theta)
-        result.slide(p.x, p.y)
+        result.move_xy(-p.x, -p.y)
+        result = result.rotate(theta)
+        result.move_xy(p.x, p.y)
         return result
 
 
@@ -116,123 +99,3 @@ class Line:
 
     def __init__(self, pt1, pt2):
         self.points = [pt1, pt2]
-
-
-# class CircleArc(LineBase):
-#     """
-#     Creates a circle arc.
-#     Parameters
-#     ----------
-#     start : Node
-#         Coordinates of start point needed to construct circle-arc.
-#     center : Node
-#         Coordinates of center point needed to construct circle-arc.
-#     end : Node
-#         Coordinates of end point needed to construct circle-arc.
-#     """
-#
-#     def __init__(self, env, start, center, end):
-#         assert isinstance(start, Node)
-#         assert isinstance(center, Node)
-#         assert isinstance(end, Node)
-#         id0 = env.addCircleArc(start._id, center._id, end._id)
-#         super().__init__(id0, [start, center, end])
-
-
-class CircleArc:
-    """ Defines a circle arc, where the first point is the start point, the second is the origo and the third one is the end point of the arc"""
-
-    def __init__(self, pt1, pt2, pt3):
-        self.points = [pt1, pt2, pt3]
-
-# class CircleArc(LineBase):
-#     """
-#     Creates a circle arc.
-#     Parameters
-#     ----------
-#     start : Point
-#         Coordinates of start point needed to construct circle-arc.
-#     center : Point
-#         Coordinates of center point needed to construct circle-arc.
-#     end : Point
-#         Coordinates of end point needed to construct circle-arc.
-#     """
-#
-#     def __init__(self, env, start, center, end):
-#         assert isinstance(start, Point)
-#         assert isinstance(center, Point)
-#         assert isinstance(end, Point)
-#         id0 = env.addCircleArc(start._id, center._id, end._id)
-#         super().__init__(id0, [start, center, end])
-
-# class Rect:
-#     """A rectangle identified by two points.
-#
-#     The rectangle stores left, top, right, and bottom values.
-#
-#     Coordinates are based on screen coordinates.
-#
-#     origin                               top
-#        +-----> x increases                |
-#        |                           left  -+-  right
-#        v                                  |
-#     y increases                         bottom
-#
-#     set_points  -- reset rectangle coordinates
-#     contains  -- is a point inside?
-#     overlaps  -- does a rectangle overlap?
-#     top_left  -- get top-left corner
-#     bottom_right  -- get bottom-right corner
-#     expanded_by  -- grow (or shrink)
-#     """
-#
-#     def __init__(self, pt1, pt2):
-#         """Initialize a rectangle from two points."""
-#         self.set_points(pt1, pt2)
-#
-#     def set_points(self, pt1, pt2):
-#         """Reset the rectangle coordinates."""
-#         (x1, y1) = pt1.as_tuple()
-#         (x2, y2) = pt2.as_tuple()
-#         self.left = min(x1, x2)
-#         self.top = min(y1, y2)
-#         self.right = max(x1, x2)
-#         self.bottom = max(y1, y2)
-#
-#     def contains(self, pt):
-#         """Return true if a point is inside the rectangle."""
-#         x, y = pt.as_tuple()
-#         return (self.left <= x <= self.right and
-#                 self.top <= y <= self.bottom)
-#
-#     def overlaps(self, other):
-#         """Return true if a rectangle overlaps this rectangle."""
-#         return (self.right > other.left and self.left < other.right and
-#                 self.top < other.bottom and self.bottom > other.top)
-#
-#     def top_left(self):
-#         """Return the top-left corner as a Point."""
-#         return Point(self.left, self.top)
-#
-#     def bottom_right(self):
-#         """Return the bottom-right corner as a Point."""
-#         return Point(self.right, self.bottom)
-#
-#     def expanded_by(self, n):
-#         """Return a rectangle with extended borders.
-#
-#         Create a new rectangle that is wider and taller than the
-#         immediate one. All sides are extended by "n" points.
-#         """
-#         p1 = Point(self.left - n, self.top - n)
-#         p2 = Point(self.right + n, self.bottom + n)
-#         return Rect(p1, p2)
-#
-#     def __str__(self):
-#         return "<Rect (%s,%s)-(%s,%s)>" % (self.left, self.top,
-#                                            self.right, self.bottom)
-#
-#     def __repr__(self):
-#         return "%s(%r, %r)" % (self.__class__.__name__,
-#                                Point(self.left, self.top),
-#                                Point(self.right, self.bottom))
