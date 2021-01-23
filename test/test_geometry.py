@@ -1,5 +1,5 @@
 from unittest import TestCase
-from artapsegment.objects import Node
+from artap_segment.objects import Node
 
 class TestNodeOperations(TestCase):
 
