@@ -6,6 +6,11 @@ python:
 
 sudo: false
 
+env:
+    - DJANGO=1.11
+    - DJANGO=2.0
+    - DJANGO=2.1
+
 matrix:
     fast_finish: true
     include:
