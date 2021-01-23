@@ -4,6 +4,7 @@
 
 [build-status-image]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
 [travis]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
+[![codecov](https://codecov.io/gh/tamasorosz/artap-segment/branch/main/graph/badge.svg?token=zH6pBqqnid)](https://codecov.io/gh/tamasorosz/artap-segment)
 
 SimplE GeoMetry gENeraTion for fem-based optimization
 
