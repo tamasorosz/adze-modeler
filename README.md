@@ -3,8 +3,7 @@
 [![build-status-image]][travis]
 
 [build-status-image]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
-[travis]: https://travis-ci.org/GreyZmeem/django-ssr?branch=master
-[coverage-status-image]: https://img.shields.io/codecov/c/github/GreyZmeem/django-ssr/master.svg
+[travis]: https://travis-ci.com/tamasorosz/artap-segment.svg?branch=main
 
 SimplE GeoMetry gENeraTion for fem-based optimization
 
