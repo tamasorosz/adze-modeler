@@ -14,27 +14,11 @@ class Node:
         self.label = label  # can be used to denote a group of the elements and make some operation with them
         self.precision = precision  # number of the digits, every coordinate represented in the same precision
 
-    def __add__(self, p):
-        """Point(x1+x2, y1+y2)"""
-        return Node(self.x + p.x, self.y + p.y)
-
-    def __sub__(self, p):
-        """Point(x1-x2, y1-y2)"""
-        return Node(self.x - p.x, self.y - p.y)
-
-    def __mul__(self, scalar):
-        """Point(x1*x2, y1*y2)"""
-        return Node(self.x * scalar, self.y * scalar)
-
-    def __div__(self, scalar):
-        """Point(x1/x2, y1/y2)"""
-        return Node(self.x / scalar, self.y / scalar)
-
     def __str__(self):
-        return "(%s, %s)" % (self.x, self.y)
+        return "(%s, %s, id=%s,label=%s)" % (self.x, self.y, self.id, self.label)
 
     def __repr__(self):
-        return "%s(%r, %r)" % (self.__class__.__name__, self.x, self.y)
+        return "%s(%r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.x, self.y, self.id, self.label)
 
     def length(self):
         return math.sqrt(self.x ** 2 + self.y ** 2)
@@ -51,22 +35,8 @@ class Node:
         """Return a full copy of this point."""
         return Node(self.x, self.y, self.id, self.label, self.precision)
 
-    # def move_to(self, x, y):
-    #    """Reset x & y coordinates."""
-    #    self.x = x
-    #    self.y = y
-
-    def move(self, p):
-        """Move to new (x+dx,y+dy)."""
-        self.x = round(self.x + p.x, self.precision)
-        self.y = round(self.y + p.y, self.precision)
-
     def move_xy(self, dx, dy):
-        '''Move to new (x+dx,y+dy).
-
-        Can anyone think up a better name for this function?
-        slide? shift? delta? move_by?
-        '''
+        """Move to new (x+dx,y+dy)."""
         self.x = round(self.x + dx, self.precision)
         self.y = round(self.y + dy, self.precision)
 

@@ -20,3 +20,7 @@ class TestNodeOperations(TestCase):
 
         d = a.rotate_about(b, pi / 2)
         self.assertEqual((0.5, 0.5), d.as_tuple())
+
+    def test_strings(self):
+        a = Node(1.0, 0.0)
+        self.assertEqual('(1.0, 0.0, id=None,label=None)', str(a))
