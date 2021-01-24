@@ -24,3 +24,13 @@ class TestNodeOperations(TestCase):
     def test_strings(self):
         a = Node(1.0, 0.0)
         self.assertEqual('(1.0, 0.0, id=None,label=None)', str(a))
+
+    def test_distance(self):
+        a = Node(1.0, 0.0)
+        b = Node(0.5, 0.0)
+        c = a + b
+        d = a - b
+        e = a*2.
+        self.assertEqual((1.5, 0.0), c.as_tuple())
+        self.assertEqual((0.5, 0.0), d.as_tuple())
+        self.assertEqual((2.0, 0.0), e.as_tuple())

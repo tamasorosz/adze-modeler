@@ -14,6 +14,18 @@ class Node:
         self.label = label  # can be used to denote a group of the elements and make some operation with them
         self.precision = precision  # number of the digits, every coordinate represented in the same precision
 
+    def __add__(self, p):
+        """Point(x1+x2, y1+y2)"""
+        return Node(self.x + p.x, self.y + p.y)
+
+    def __sub__(self, p):
+        """Point(x1-x2, y1-y2)"""
+        return Node(self.x - p.x, self.y - p.y)
+
+    def __mul__(self, scalar):
+        """Point(x1*x2, y1*y2)"""
+        return Node(self.x * scalar, self.y * scalar)
+
     def __str__(self):
         return "(%s, %s, id=%s,label=%s)" % (self.x, self.y, self.id, self.label)
 
