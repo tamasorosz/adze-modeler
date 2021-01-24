@@ -77,7 +77,7 @@ class Node:
 
 
 class Line:
-    """ A directed line, which is defined by the (start -> end) points """
+   """ A directed line, which is defined by the (start -> end) points """
 
-    def __init__(self, pt1, pt2):
-        self.points = [pt1, pt2]
+   def __init__(self, pt1, pt2):
+       self.points = [pt1, pt2]
