@@ -1,3 +1,4 @@
-flake8
-tox
-svg.path
+numpy
+svgwrite
+svgpathtools
+importlib-resources
