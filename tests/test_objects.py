@@ -1,5 +1,5 @@
 from unittest import TestCase
-from artapsegment.objects import Node
+from artapsegment.objects import Node, Line, CubicBezier
 from math import pi
 
 
@@ -30,7 +30,23 @@ class TestNodeOperations(TestCase):
         b = Node(0.5, 0.0)
         c = a + b
         d = a - b
-        e = a*2.
+        e = a * 2.
         self.assertEqual((1.5, 0.0), c.as_tuple())
         self.assertEqual((0.5, 0.0), d.as_tuple())
         self.assertEqual((2.0, 0.0), e.as_tuple())
+
+
+class TestLine(TestCase):
+    def test_init_line(self):
+        a = Node(1.0, 0.0)
+        b = Node(0.5, 0.0)
+
+        l = Line(a, b, id=1, label="test")
+
+        self.assertEqual("test", l.label)
+        self.assertEqual(a, l.start_pt)
+        self.assertEqual(b, l.end_pt)
+
+        # repr string
+        self.assertIn(
+            'Line(Node(1.0, 0.0, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label=\'test\')', str(l))
