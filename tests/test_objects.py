@@ -50,3 +50,23 @@ class TestLine(TestCase):
         # repr string
         self.assertIn(
             'Line(Node(1.0, 0.0, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label=\'test\')', str(l))
+
+
+class TestCubicBezier(TestCase):
+    def test_init_bezier(self):
+        a = Node(1.0, 0.0)
+        b = Node(0.5, 0.0)
+
+        c1 = Node(0.6, 0.1)
+        c2 = Node(0.7, 0.2)
+
+        cb = CubicBezier(a, c1, c2, b, id=1, label="test")
+
+        self.assertEqual("test", cb.label)
+        self.assertEqual(a, cb.start_pt)
+        self.assertEqual(b, cb.end_pt)
+
+        self.assertIn(
+            'CubicBezier(Node(1.0, 0.0, id=None,label=None), Node(0.6, 0.1, id=None,label=None), Node(0.7, 0.2, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label=\'test\')',
+            str(cb))
+        print(cb)

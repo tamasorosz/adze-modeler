@@ -91,10 +91,14 @@ class Line:
 
 class CubicBezier:
 
-    def __init__(self, start_pt, control1, control2, end_pt, id, label):
+    def __init__(self, start_pt, control1, control2, end_pt, id=None, label=None):
         self.start_pt = start_pt
         self.control1 = control1
         self.control2 = control2
         self.end_pt = end_pt
         self.id = id
         self.label = label
+
+    def __repr__(self):
+        return "%s(%r, %r, %r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.start_pt, self.control1,
+                                                       self.control2, self.end_pt, self.id, self.label)
