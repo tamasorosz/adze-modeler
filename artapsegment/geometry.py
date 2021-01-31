@@ -30,7 +30,7 @@ class Geometry():
     def add_cubic_bezier(self, cb):
         self.cubic_beziers.append(cb)
 
-        self.nodes.append(cb.start)
+        self.nodes.append(cb.start_pt)
         self.nodes.append(cb.control1)
         self.nodes.append(cb.control2)
-        self.nodes.append(cb.ends)
+        self.nodes.append(cb.end_pt)
