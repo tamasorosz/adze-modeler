@@ -34,3 +34,19 @@ class Geometry():
         self.nodes.append(cb.control1)
         self.nodes.append(cb.control2)
         self.nodes.append(cb.end_pt)
+
+    def __repr__(self):
+        msg = ""
+        msg += str("\n Nodes: \n -----------------------\n")
+        for node in self.nodes:
+            msg += str(node) + "\n"
+
+        msg += str("\n Lines: \n -----------------------\n")
+        for line in self.lines:
+            msg += str(line) + "\n"
+
+        msg += str("\n CubicBezier: \n -----------------------\n")
+        for cubicbezier in self.cubic_beziers:
+            msg += str(cubicbezier) + "\n"
+
+        return msg
