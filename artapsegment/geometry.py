@@ -35,6 +35,10 @@ class Geometry():
         self.nodes.append(cb.control2)
         self.nodes.append(cb.end_pt)
 
+    def meshi_it(self, mesh_strategy):
+        mesh = mesh_strategy(self.nodes, self.lines)
+        return mesh
+
     def __repr__(self):
         msg = ""
         msg += str("\n Nodes: \n -----------------------\n")

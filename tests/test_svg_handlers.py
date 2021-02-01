@@ -1,6 +1,5 @@
 from unittest import TestCase
 from artapsegment.svg_handlers import import_svg
-from artapsegment.objects import Node, Line, CubicBezier
 import os
 
 
