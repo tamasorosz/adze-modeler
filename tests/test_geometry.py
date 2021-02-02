@@ -62,7 +62,7 @@ class TestMeshing(TestCase):
         gmsh_strategy(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)
 
     def test_mesh_the_owl(self):
-        path = files('examples.owl').joinpath('owl-svgrepo-com.svg')
+        path = files('examples.owl').joinpath('owl-shape.svg')
         geo = import_svg(path.as_posix())
-
-        #gmsh_strategy(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)
+        print(geo)
+        gmsh_strategy(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)

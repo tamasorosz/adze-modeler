@@ -107,16 +107,27 @@ def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
             temp = geom.add_line(p0=start_pt, p1=end_pt)
             glines.append(temp)
 
-        ll = geom.add_curve_loop(glines)
-        pl = geom.add_plane_surface(ll)
-
         # add cubic beziers
-        # for cb in cubic_beziers:
-        #    geom.add_bspline([cb.start_pt.id, cb.control1.id, cb.control2.id, cb.end_pt.id])
+        gbeziers = []
+        for cb in cubic_beziers:
+            for i in range(len(points)):
+                if node_gmsh_point_distance(cb.start_pt, points[i]) < epsilon:
+                    start_pt = points[i]
+                if node_gmsh_point_distance(cb.end_pt, points[i]) < epsilon:
+                    end_pt = points[i]
+                if node_gmsh_point_distance(cb.control1, points[i]) < epsilon:
+                    control1 = points[i]
+                if node_gmsh_point_distance(cb.control2, points[i]) < epsilon:
+                    control2 = points[i]
+
+            temp = geom.add_bspline([start_pt, control1, control2, end_pt])
+            gbeziers.append(temp)
+        #ll = geom.add_curve_loop(glines)
+        #pl = geom.add_plane_surface(ll)
 
         geom.save_geometry("test.geo_unrolled")
-        mesh = geom.generate_mesh()
-        mesh.write("test.vtk")
+        #mesh = geom.generate_mesh()
+        #mesh.write("test.vtk")
 
 # with pygmsh.geo.Geometry() as geom:
 #     lcar = 0.1
