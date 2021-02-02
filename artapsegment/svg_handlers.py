@@ -37,6 +37,8 @@ def import_svg(svg_img, *args):
                         imported_geo.add_cubic_bezier(geo.CubicBezier(start, control1, control2, end, id + 4))
                         id += 5
 
+    imported_geo.merge_points()
+
     # print(imported_geo)
     return imported_geo
 

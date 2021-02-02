@@ -15,6 +15,7 @@ class Geometry():
         self.lines = []
         self.circle_arcs = []
         self.cubic_beziers = []
+        self.epsilon = 1.e-5
 
     def add_object(self):
         return
@@ -35,6 +36,24 @@ class Geometry():
         self.nodes.append(cb.control1)
         self.nodes.append(cb.control2)
         self.nodes.append(cb.end_pt)
+
+    def merge_points(self):
+
+        for i in range(len(self.nodes) - 1):
+            for j in range(len(self.nodes) - 1, i, -1):
+                if self.nodes[i].distance_to(self.nodes[j]) < self.epsilon:
+
+                    # renumber the start/end points of the different shape elements
+                    for line in self.lines:
+                        if line.start_pt.id == self.nodes[j].id:
+                            line.start_pt.id = self.nodes[i].id
+
+                        if line.end_pt.id == self.nodes[j].id:
+                            line.end_pt.id = self.nodes[i].id
+
+                    del self.nodes[j]
+            # if node_1.distance_to(node_2) < self.epsilon:
+            #    print(i)
 
     def meshi_it(self, mesh_strategy):
         mesh = mesh_strategy(self.nodes, self.lines, self.circle_arcs, self.cubic_beziers)
@@ -57,43 +76,62 @@ class Geometry():
         return msg
 
 
-def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
-    lcar = 0.011
-    with gmsh.Geometry() as geom:
-        # add lines
-        for line in lines:
-            start_pt = geom.add_point([line.start_pt.x, line.start_pt.y], lcar)
-            end_pt = geom.add_point([line.end_pt.x, line.end_pt.y], lcar)
-            geom.add_line(p0=start_pt, p1=end_pt)
+def node_gmsh_point_distance(node, point):
+    dx = node.x - point.x[0]
+    dy = node.y - point.x[1]
 
+    return (dx ** 2. + dy ** 2.) ** 0.5
+
+
+def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
+    lcar = 5.
+    epsilon = 1e-6
+    with gmsh.Geometry() as geom:
+        # add nodes
+        points = []
+        for node in nodes:
+            temp = geom.add_point([node.x, node.y], lcar)
+            # temp._id = node.id
+            points.append(temp)
+
+        # add lines
+        glines = []
+        for line in lines:
+            for i in range(len(points)):
+                if node_gmsh_point_distance(line.start_pt, points[i]) < epsilon:
+                    start_pt = points[i]
+
+                if node_gmsh_point_distance(line.end_pt, points[i]) < epsilon:
+                    end_pt = points[i]
+
+            temp = geom.add_line(p0=start_pt, p1=end_pt)
+            glines.append(temp)
+
+        ll = geom.add_curve_loop(glines)
+        pl = geom.add_plane_surface(ll)
 
         # add cubic beziers
-        #for cb in cubic_beziers:
+        # for cb in cubic_beziers:
         #    geom.add_bspline([cb.start_pt.id, cb.control1.id, cb.control2.id, cb.end_pt.id])
 
-        # add nodes
-        # points = []
-        # for node in nodes:
-        #    points.append(geom.add_point([node.x, node.y, node.id], lcar))
-
-        # mesh = geom.generate_mesh()
         geom.save_geometry("test.geo_unrolled")
-        #mesh.write("test.vtk")
+        mesh = geom.generate_mesh()
+        mesh.write("test.vtk")
 
-    # with pygmsh.geo.Geometry() as geom:
-    #     lcar = 0.1
-    #     p1 = geom.add_point([0.0, 0.0], lcar)
-    #     p2 = geom.add_point([1.0, 0.0], lcar)
-    #     p3 = geom.add_point([1.0, 0.5], lcar)
-    #     p4 = geom.add_point([1.0, 1.0], lcar)
-    #     s1 = geom.add_bspline([p1, p2, p3, p4])
-    #
-    #     p2 = geom.add_point([0.0, 1.0], lcar)
-    #     p3 = geom.add_point([0.5, 1.0], lcar)
-    #     s2 = geom.add_spline([p4, p3, p2, p1])
-    #
-    #     ll = geom.add_curve_loop([s1, s2])
-    #     pl = geom.add_plane_surface(ll)
-    #
-    #     mesh = geom.generate_mesh()
-    #     mesh.write("test.vtk")
+# with pygmsh.geo.Geometry() as geom:
+#     lcar = 0.1
+#     p1 = geom.add_point([0.0, 0.0], lcar)
+#     p2 = geom.add_point([1.0, 0.0], lcar)
+#     p3 = geom.add_point([1.0, 0.5], lcar)
+#     p4 = geom.add_point([1.0, 1.0], lcar)
+#     s1 = geom.add_bspline([p1, p2, p3, p4])
+#
+#     p2 = geom.add_point([0.0, 1.0], lcar)
+#     p3 = geom.add_point([0.5, 1.0], lcar)
+#     s2 = geom.add_spline([p4, p3, p2, p1])
+#
+#     ll = geom.add_curve_loop([s1, s2])
+#     pl = geom.add_plane_surface(ll)
+#
+#     mesh = geom.generate_mesh()
+#     mesh.write("test.vtk")
