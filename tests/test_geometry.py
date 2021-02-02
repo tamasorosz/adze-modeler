@@ -1,6 +1,8 @@
 from unittest import TestCase
-from artapsegment.geometry import Geometry
+from artapsegment.geometry import Geometry, gmsh_strategy
+from artapsegment.svg_handlers import import_svg
 from artapsegment.objects import Node, Line, CubicBezier
+from importlib_resources import files
 
 
 class TestGeometry(TestCase):
@@ -13,7 +15,6 @@ class TestGeometry(TestCase):
         self.assertEqual([], geo.cubic_beziers)
 
     def test_add_nodes_and_line(self):
-
         geo = Geometry()
 
         a = Node(1.0, 0.0)
@@ -21,16 +22,14 @@ class TestGeometry(TestCase):
 
         l = Line(a, b, id=1, label="test")
 
-
         geo.add_node(a)
         geo.add_node(b)
-        self.assertEqual(a,geo.nodes[0])
+        self.assertEqual(a, geo.nodes[0])
 
         geo.add_line(l)
-        self.assertEqual(l,geo.lines[0])
+        self.assertEqual(l, geo.lines[0])
 
     def test_add_bezier(self):
-
         geo = Geometry()
 
         a = Node(1.0, 0.0)
@@ -48,8 +47,22 @@ class TestGeometry(TestCase):
         geo.add_node(c1)
         geo.add_node(c2)
 
-        self.assertEqual(c1,geo.nodes[2])
+        self.assertEqual(c1, geo.nodes[2])
 
         geo.add_cubic_bezier(cb)
-        self.assertEqual(cb,geo.cubic_beziers[0])
+        self.assertEqual(cb, geo.cubic_beziers[0])
 
+
+class TestMeshing(TestCase):
+
+    def test_mesh_the_triangle(self):
+        path = files('examples.triangle').joinpath('triangle.svg')
+        geo = import_svg(path.as_posix())
+
+        gmsh_strategy(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)
+
+    def test_mesh_the_owl(self):
+        path = files('examples.owl').joinpath('owl-svgrepo-com.svg')
+        geo = import_svg(path.as_posix())
+
+        gmsh_strategy(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)

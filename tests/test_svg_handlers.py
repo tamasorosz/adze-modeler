@@ -3,10 +3,6 @@ from artapsegment.svg_handlers import import_svg
 from importlib_resources import files
 
 
-# Reads contents with UTF-8 encoding and returns str.
-# eml = files('email.tests.data').joinpath('message.eml').read_text()
-
-
 class TestSvgImport(TestCase):
 
     def test_owl_import_to_geometry(self):

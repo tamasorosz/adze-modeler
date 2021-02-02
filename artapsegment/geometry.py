@@ -58,20 +58,27 @@ class Geometry():
 
 
 def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
-    lcar = 0.1
+    lcar = 0.011
     with gmsh.Geometry() as geom:
-
-        # add nodes
-        for node in nodes:
-            geom.add_point([node.x, node.y], lcar)
-
         # add lines
         for line in lines:
-            geom.add_line([line.start_pt.id, line.end_pt.id])
+            start_pt = geom.add_point([line.start_pt.x, line.start_pt.y], lcar)
+            end_pt = geom.add_point([line.end_pt.x, line.end_pt.y], lcar)
+            geom.add_line(p0=start_pt, p1=end_pt)
+
 
         # add cubic beziers
-        for cb in cubic_beziers:
-            geom.add_bspline([line.start_pt.id, line.control1.id, line.control2.id, line.end_pt.id])
+        #for cb in cubic_beziers:
+        #    geom.add_bspline([cb.start_pt.id, cb.control1.id, cb.control2.id, cb.end_pt.id])
+
+        # add nodes
+        # points = []
+        # for node in nodes:
+        #    points.append(geom.add_point([node.x, node.y, node.id], lcar))
+
+        # mesh = geom.generate_mesh()
+        geom.save_geometry("test.geo_unrolled")
+        #mesh.write("test.vtk")
 
     # with pygmsh.geo.Geometry() as geom:
     #     lcar = 0.1
