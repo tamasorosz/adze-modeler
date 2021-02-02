@@ -13,10 +13,10 @@ class TestSvgImport(TestCase):
         eml = files('examples.owl').joinpath('owl-svgrepo-com.svg')
         print(eml)
         geo = import_svg(eml.as_posix())
-
+        print(geo)
         # checks the first coordinate of the first node
         self.assertEqual(445.642, geo.nodes[0].x)
-
+        self.assertEqual(636, geo.nodes[-1].id)
         # the number of lines and cubicbeziers should be larger than 0
         self.assertTrue(len(geo.lines) > 0)
         self.assertTrue(len(geo.cubic_beziers) > 0)

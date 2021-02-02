@@ -1,4 +1,5 @@
 numpy
-svgwrite
 svgpathtools
 importlib-resources
+pygmsh
+gmsh
