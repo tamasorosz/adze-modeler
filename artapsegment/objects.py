@@ -89,6 +89,21 @@ class Line:
         return "%s(%r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.start_pt, self.end_pt, self.id, self.label)
 
 
+class CircleArc:
+    """ A directed line, which is defined by the (start -> end) points """
+
+    def __init__(self, start_pt, center_pt, end_pt, id=None, label=None):
+        self.start_pt = start_pt
+        self.center_pt = center_pt
+        self.end_pt = end_pt
+        self.id = id
+        self.label = label
+
+    def __repr__(self):
+        return "%s(%r, %r, %r, id=%r,label=%r)" % (
+        self.__class__.__name__, self.start_pt, self.center_pt, self.end_pt, self.id, self.label)
+
+
 class CubicBezier:
 
     def __init__(self, start_pt, control1, control2, end_pt, id=None, label=None):

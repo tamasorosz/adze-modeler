@@ -3,3 +3,4 @@ svgpathtools
 importlib-resources
 pygmsh
 gmsh
+ezdxf

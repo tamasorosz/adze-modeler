@@ -4,7 +4,7 @@ A general geometrical shape can defined by the following objects:
     Nodes (Points), Lines, Circle Arcs, Cubic Bezeirs
 """
 
-from artapsegment.objects import Node, Line, CubicBezier
+from artapsegment.objects import Node, Line, CubicBezier, CircleArc
 import pygmsh.geo as gmsh
 
 
@@ -28,6 +28,13 @@ class Geometry():
         # save every start and end points for the geoemtry
         self.nodes.append(line.start_pt)
         self.nodes.append(line.end_pt)
+
+    def add_arc(self, arc):
+        self.circle_arcs.append(arc)
+        # save every start and end points for the geoemtry
+        self.nodes.append(arc.start_pt)
+        self.nodes.append(arc.end_pt)
+        self.nodes.append(arc.center)
 
     def add_cubic_bezier(self, cb):
         self.cubic_beziers.append(cb)
@@ -68,6 +75,10 @@ class Geometry():
         msg += str("\n Lines: \n -----------------------\n")
         for line in self.lines:
             msg += str(line) + "\n"
+
+        msg += str("\n Circle Arcs: \n -----------------------\n")
+        for arc in self.circle_arcs:
+            msg += str(arc) + "\n"
 
         msg += str("\n CubicBezier: \n -----------------------\n")
         for cubicbezier in self.cubic_beziers:
