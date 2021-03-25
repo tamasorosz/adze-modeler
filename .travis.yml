@@ -11,7 +11,6 @@ install:
     - pip install -U pytest
     - pip install coverage tox-travis
     - apt install python3-gmsh
-    - pip install pygmsh
 script:
     - tox
 
