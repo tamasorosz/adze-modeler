@@ -1,5 +1,5 @@
 from unittest import TestCase
-from artapsegment.objects import Node, Line, CubicBezier
+from adze_modeler.objects import Node, Line, CubicBezier
 from math import pi
 
 
