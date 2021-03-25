@@ -1,4 +1,4 @@
-# artap-segment
+# ADZE-Modeler
 
 [![build-status-image]][travis]
 
@@ -12,7 +12,7 @@
 [![Code Style](https://badgen.net/badge/Code%20Style/black?labelColor=2e3a44&color=000000)](https://github.com/psf/black)
 
 
-## SimplE GeoMetry gENeraTion for fem-based optimization
+## Geometry modeler for Pre-concept Design Optimization
 
 A FEM-based optimization needs a parametrized geometry for the mesh generation. The goal of this project to provide a 
 simple set of objects and entities for geometry generation. The defined geometry can be exported for many FEM codes scripting files or svg, dxf formats. 

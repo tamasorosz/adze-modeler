@@ -1,7 +1,7 @@
 from unittest import TestCase
-from artapsegment.geometry import Geometry, gmsh_strategy
-from artapsegment.svg_handlers import import_svg
-from artapsegment.objects import Node, Line, CubicBezier
+from adze_modeler.geometry import Geometry, gmsh_strategy
+from adze_modeler.svg_handlers import import_svg
+from adze_modeler.objects import Node, Line, CubicBezier
 from importlib_resources import files
 
 

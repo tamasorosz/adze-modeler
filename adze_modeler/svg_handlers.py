@@ -1,6 +1,6 @@
 import svgpathtools as svg
 import pygmsh
-import artapsegment.geometry as geo
+import adze_modeler.geometry as geo
 import cmath
 
 
