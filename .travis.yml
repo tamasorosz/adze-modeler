@@ -7,7 +7,7 @@ python:
 sudo: false
 
 install:
-    - pip install coverage tox tox-travis
+    - pip install coverage tox-travis
 
 script:
     - tox
