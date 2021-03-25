@@ -1,6 +1,5 @@
 import sys
 import ezdxf
-import pygmsh
 import adze_modeler.geometry as geo
 
 
