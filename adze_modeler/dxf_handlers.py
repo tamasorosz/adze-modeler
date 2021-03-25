@@ -1,7 +1,7 @@
 import sys
 import ezdxf
 import pygmsh
-import artapsegment.geometry as geo
+import adze_modeler.geometry as geo
 
 
 def import_dxf(dxf_file):

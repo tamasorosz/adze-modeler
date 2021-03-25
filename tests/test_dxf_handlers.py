@@ -1,5 +1,5 @@
 from unittest import TestCase
-from artapsegment.dxf_handlers import import_dxf
+from adze_modeler.dxf_handlers import import_dxf
 from importlib_resources import files
 
 
