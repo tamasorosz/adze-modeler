@@ -7,8 +7,10 @@ python:
 sudo: false
 
 install:
-    - pip install coverage tox-travis
-
+    - pip install -U pip
+    - pip install -U pytest
+    - pip install coverage tox tox-travis
+    - pip install codecov
 script:
     - tox
 
