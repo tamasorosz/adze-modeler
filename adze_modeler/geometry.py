@@ -3,8 +3,6 @@ This class realize a layer, where the different elements of the geometry can be 
 A general geometrical shape can defined by the following objects:
     Nodes (Points), Lines, Circle Arcs, Cubic Bezeirs
 """
-
-from adze_modeler.objects import Node, Line, CubicBezier, CircleArc
 import pygmsh.geo as gmsh
 
 
@@ -94,7 +92,7 @@ def node_gmsh_point_distance(node, point):
     return (dx ** 2. + dy ** 2.) ** 0.5
 
 
-def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
+def gmsh_writer(nodes, lines, arcs, cubic_beziers):
     lcar = 5.
     epsilon = 1e-6
     with gmsh.Geometry() as geom:
@@ -133,9 +131,9 @@ def gmsh_strategy(nodes, lines, arcs, cubic_beziers):
 
             temp = geom.add_bspline([start_pt, control1, control2, end_pt])
             gbeziers.append(temp)
-        #ll = geom.add_curve_loop(glines)
-        #pl = geom.add_plane_surface(ll)
+        # ll = geom.add_curve_loop(glines)
+        # pl = geom.add_plane_surface(ll)
 
         geom.save_geometry("test.geo_unrolled")
-        #mesh = geom.generate_mesh()
-        #mesh.write("test.vtk")
+        # mesh = geom.generate_mesh()
+        # mesh.write("test.vtk")

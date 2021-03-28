@@ -14,8 +14,6 @@
 
 ## Geometry modeler for Pre-concept Design Optimization
 
-A FEM-based optimization needs a parametrized geometry for the mesh generation. The goal of this project to provide a 
-simple set of objects and entities for geometry generation. The defined geometry can be exported for many FEM codes scripting files or svg, dxf formats. 
-Moreover, the code will be supports the importation of hand-made svg patterns. For the geometry generation the user can use his/her favourite graphic designer app (e.g. Inkscape) where the user can define the whole goemetry,
-or only its part and play with it to generate a geometry like in a jigsaw puzzle. 
-
+Why the name?
+-------------
+Adze is a simple and versatile tool, which is used from the ancient times for wood carving. This is the similarity with the base concept of this tool, which is 
