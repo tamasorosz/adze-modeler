@@ -4,6 +4,7 @@ A general geometrical shape can defined by the following objects:
     Nodes (Points), Lines, Circle Arcs, Cubic Bezeirs
 """
 import pygmsh.geo as gmsh
+from adze_modeler.objects import Node, Line, CircleArc, CubicBezier
 
 
 class Geometry():

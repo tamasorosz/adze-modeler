@@ -57,6 +57,7 @@ class TestMeshing(TestCase):
 
     def test_mesh_the_triangle(self):
         path = files('examples.triangle').joinpath('triangle.svg')
+        print(path)
         geo = import_svg(path.as_posix())
         print(geo)
         gmsh_writer(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)
