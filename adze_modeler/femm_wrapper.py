@@ -4,6 +4,9 @@ The code generated one snapshot from the created model, which can be run during 
 """
 
 from adze_modeler.geometry import Geometry
+from string import Template
+
+fields = {'electrostatic', 'magnetic', 'thermal'}
 
 
 class FemmWriter():
@@ -18,6 +21,73 @@ class FemmWriter():
         with open(file_name, 'w') as writer:
             ...
 
+    @staticmethod
+    def add_node(x, y, field='magnetic'):
+        """ adds a node to the given point (x,y)"""
+        if field == 'magnetic':
+            cmd = Template('mi_addnode($x_coord, $y_coord)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_addnode($x_coord, $y_coord)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_addnode($x_coord, $y_coord)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_addnode($x_coord, $y_coord)')
+
+        return cmd.substitute(x_coord=x, y_coord=y)
+
+    @staticmethod
+    def add_segment(x1, y1, x2, y2, field='magnetic'):
+        """ Add a new line segment from node closest to (x1,y1) tonode closest to (x2,y2) """
+        if field == 'magnetic':
+            cmd = Template('mi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+
+        return cmd.substitute(x1_coord=x1, y1_coord=y1, x2_coord=x2, y2_coord=y2)
+
+    @staticmethod
+    def add_blocklabel(x, y, field='magnetic'):
+        """ Add a new block label at (x,y) """
+
+        if field == 'magnetic':
+            cmd = Template('mi_addblocklabel($x_coord, $y_coord)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_addblocklabel($x_coord, $y_coord)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_addblocklabel($x_coord, $y_coord)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_addblocklabel($x_coord, $y_coord)')
+
+        return cmd.substitute(x_coord=x, y_coord=y)
+
+    # Gmsh ASCII output uses `%.16g` for floating point values,
+    # meshio uses same precision but exponential notation `%.16e`.
+    # def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
+    #     """Writes a Gmsh msh file."""
+    #     try:
+    #         writer = _writers[fmt_version]
+    #     except KeyError:
+    #         try:
+    #             writer = _writers[fmt_version]
+    #         except KeyError:
+    #             raise WriteError(
+    #                 "Need mesh format in {} (got {})".format(
+    #                     sorted(_writers.keys()), fmt_version
+    #                 )
+    #             )
 
 
 """
