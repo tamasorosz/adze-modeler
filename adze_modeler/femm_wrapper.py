@@ -73,7 +73,29 @@ class FemmWriter():
 
         return cmd.substitute(x_coord=x, y_coord=y)
 
-    # Gmsh ASCII output uses `%.16g` for floating point values,
+    @staticmethod
+    def add_arc(x1, y1, x2, y2, angle, maxseg, field='magnetic'):
+        """
+        Add a new arc segment from the nearest nodeto (x1,y1) to the nearest node to (x2,y2)
+        with angle ‘angle’ divided into ‘maxseg’ segments.
+        """
+        if field == 'magnetic':
+            cmd = Template('mi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+
+        return cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
+
+
+
+        # Gmsh ASCII output uses `%.16g` for floating point values,
     # meshio uses same precision but exponential notation `%.16e`.
     # def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
     #     """Writes a Gmsh msh file."""

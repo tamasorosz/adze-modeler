@@ -28,3 +28,10 @@ class FemmTester(TestCase):
 
         res = FemmWriter.add_blocklabel(x, y)
         self.assertEqual('mi_addblocklabel(1.0, 0.0)', res)
+
+    def test_addarc(self):
+        x1, x2 = 1.0, 1.0
+        y1, y2 = 0.0, 1.0
+
+        res = FemmWriter.add_arc(x1, y1, x2, y2, 90.0, 1)
+        self.assertEqual('mi_addarc(1.0, 0.0, 1.0, 1.0, 90.0, 1)', res)
