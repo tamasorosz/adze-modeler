@@ -18,6 +18,11 @@ class Model(metaclass=ABCMeta):
         pass
 
 
+class PhysicalModel():
+    materials = []
+    boundary_conditions = []
+
+
 class Label(SimpleNamespace):
 
     def __init__(self, node_id, label_id, material):
