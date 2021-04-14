@@ -185,7 +185,122 @@ class FemmWriter():
 
         return cmd
 
+    # object selection commnads from FEMM MANUAL page 84.
 
+    @staticmethod
+    def clear_selected(field='magnetic'):
+        """ Clear all selected nodes, blocks, segments and arc segments. """
+
+        if field == 'magnetic':
+            cmd = 'mi_clearselected()'
+
+        if field == 'electrostatic':
+            cmd = 'ei_clearselected()'
+
+        if field == 'heat_flow':
+            cmd = 'hi_clearselected()'
+
+        if field == 'current_flow':
+            cmd = 'ci_clearselected()'
+
+        return cmd
+
+    @staticmethod
+    def select_segment(x, y, field='magnetic'):
+        """Select the line segment closest to (x,y) """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectsegment($xp, $yp)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectsegment($xp, $yp)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectsegment($xp, $yp)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectsegment($xp, $yp)')
+
+        return cmd.substitute(xp=x, yp=y)
+
+    @staticmethod
+    def select_node(x, y, field='magnetic'):
+        """Select node closest to (x,y), Returns the coordinates ofthe se-lected node """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectnode($xp, $yp)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectnode($xp, $yp)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectnode($xp, $yp)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectnode($xp, $yp)')
+
+        return cmd.substitute(xp=x, yp=y)
+
+    @staticmethod
+    def select_label(x, y, field='magnetic'):
+        """ Select the label closet to (x,y). Returns the coordinates of the selected label. """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectlabel($xp, $yp)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectlabel($xp, $yp)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectlabel($xp, $yp)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectlabel($xp, $yp)')
+
+        return cmd.substitute(xp=x, yp=y)
+
+    @staticmethod
+    def select_group(n, field='magnetic'):
+        """
+        Select the n th group of nodes, segments, arc segments and block labels.
+        This function will clear all previously selected elements and leave the edit mode in 4(group)
+        """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectgroup($np)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectgroup($np)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectgroup($np)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectgroup($np)')
+
+        return cmd.substitute(np=n)
+
+    @staticmethod
+    def select_circle(x, y, R, editmode, field='magnetic'):
+        """
+        Select circle selects objects within a circle of radius R centered at(x, y).If only x, y, and R paramters
+        are given, the current edit mode is used.If the editmode parameter is used, 0 denotes nodes, 2 denotes block
+        labels, 2 denotes segments, 3 denotes arcs, and 4 specifies that all entity types are to be selected.
+        """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectcircle($xp, $yp, $Rp, $Editmode)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectcircle($xp, $yp, $Rp, $Editmode)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectcircle($xp, $yp, $Rp, $Editmode)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectcircle($xp, $yp, $Rp, $Editmode)')
+
+        return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
 
     # Gmsh ASCII output uses `%.16g` for floating point values,
     # meshio uses same precision but exponential notation `%.16e`.

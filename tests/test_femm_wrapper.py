@@ -50,3 +50,21 @@ class FemmTester(TestCase):
 
     def test_delete_selected_arc_segments(self):
         self.assertEqual('mi_deleteselectedarcsegments', FemmWriter.delete_delete_selected_arc_segments())
+
+    def test_clear_seelcted(self):
+        self.assertEqual('mi_clearselected()', FemmWriter.clear_selected())
+
+    def test_select_segment(self):
+        self.assertEqual('mi_selectsegment(1.0, 1.0)', FemmWriter.select_segment(1.0, 1.0))
+
+    def test_select_node(self):
+        self.assertEqual('mi_selectnode(1.0, 1.0)', FemmWriter.select_node(1.0, 1.0))
+
+    def test_select_label(self):
+        self.assertEqual('mi_selectlabel(1.0, 1.0)', FemmWriter.select_label(1.0, 1.0))
+
+    def test_select_group(self):
+        self.assertEqual('mi_selectgroup(4)', FemmWriter.select_group(4))
+
+    def test_select_circle(self):
+        self.assertEqual('mi_selectcircle(1.0, 2.0, 0.4, 3)', FemmWriter.select_circle(1.0, 2.0, 0.4, 3))
