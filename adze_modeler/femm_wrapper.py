@@ -385,12 +385,13 @@ class FemmWriter:
 
         return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
-    def magnetic_problem(self, freq, units, type, precision=1e-6, depth=None, minangle=None, acsolver=None):
+    # problem commands for the magnetic problem
+    def magnetic_problem(self, freq, unit, type, precision=1e-8, depth=1, minangle=30, acsolver=0):
         """
          Definition of the magnetic problem, like probdef(0,'inches','axi',1e-8,0,30);
 
          :param freq: Frequency in Hertz (required)
-         :param units: "inches","millimeters","centimeters","mils","meters, and"micrometers" (required)
+         :param unit: "inches","millimeters","centimeters","mils","meters, and"micrometers" (required)
          :param type: "planar", "axi" (required)
          :param precision: 1e-8 (required)
          :param depth: depth of the analysis (not mandatory)
@@ -407,9 +408,33 @@ class FemmWriter:
          anaxisymmetric problem. The precision parameter dictates the precision required by the solver.
          For example, entering 1E-8 requires the RMS of the residual to be less than 10−8.A fifth parameter,
          representing the depth of sthe problem in the into-the-page direction for2-D planar problems, can also also be
-         specified. A sixth parameter represents the minimumangle constraint sent to the mesh generator.
-         A seventh parameter specifies the solver type tobe used for AC problems.
+         specified. A sixth parameter represents the minimumangle constraint sent to the mesh generator, 30 degress is
+         the usual choice. The acsolver parameter specifies which solver is to be used for AC problems:
+         0 for successive approximation, 1 for Newton. A seventh parameter specifies the solver type tobe used
+         for AC problems.
         """
+
+        if self.field != kw_magnetic:
+            raise ValueError("Set the magnetic field parameter!")
+
+        cmd = Template('mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver')
+        return cmd.substitute(frequency=freq, units=unit, type=type, precision=precision, depth=depth,
+                              minangle=minangle, )
+
+    def run_analysis(self, flag=1):
+        """
+         Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
+         minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
+         If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
+         the main window is minimized, the solver runs minimized, too.
+        """
+        if self.field == kw_magnetic:
+            cmd = Template('mi_analyze($flag)')
+
+        return cmd.substitute(flag=flag)
+
+    def run_femm(self):
+        """This function runs the femm simulation with the selected file."""
 
         return
 
