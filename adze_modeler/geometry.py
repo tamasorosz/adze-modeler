@@ -3,8 +3,6 @@ This class realize a layer, where the different elements of the geometry can be 
 A general geometrical shape can defined by the following objects:
     Nodes (Points), Lines, Circle Arcs, Cubic Bezeirs
 """
-import pygmsh.geo as gmsh
-
 
 class Geometry():
 

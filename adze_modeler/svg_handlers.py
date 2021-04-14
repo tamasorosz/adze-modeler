@@ -2,7 +2,6 @@ import svgpathtools as svg
 import pygmsh
 import adze_modeler.geometry as geo
 import adze_modeler.objects as obj
-import cmath
 
 
 def import_svg(svg_img, *args):
