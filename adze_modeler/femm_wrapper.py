@@ -9,11 +9,18 @@ The original FEMM code has separate scripting commands for the geometry generati
 from adze_modeler.geometry import Geometry
 from string import Template
 
-fields = {'current', 'electrostatic', 'magnetic', 'thermal'}
+# keywords
+
+kw_current_flow = 'current_flow'
+kw_electrostatic = 'electrostatic'
+kw_magnetic = 'magnetic'
+kw_heat_flow = 'heat_flow'
+
+fields = [kw_electrostatic, kw_magnetic, kw_current_flow, kw_heat_flow]
 
 
 class FemmWriter:
-    field = 'magnetic'
+    field = kw_magnetic
 
     def write(self, model, file_name):
         """ Generate a runnable lua-script for a FEMM calculation.
@@ -26,7 +33,6 @@ class FemmWriter:
             ...
 
     # object add remove commnads from FEMM MANUAL page 84.
-
     def add_node(self, x, y):
         """ adds a node to the given point (x,y)"""
 
@@ -34,16 +40,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_addnode($x_coord, $y_coord)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_addnode($x_coord, $y_coord)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_addnode($x_coord, $y_coord)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_addnode($x_coord, $y_coord)')
 
         return cmd.substitute(x_coord=x, y_coord=y)
@@ -55,16 +61,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
 
         return cmd.substitute(x1_coord=x1, y1_coord=y1, x2_coord=x2, y2_coord=y2)
@@ -76,16 +82,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_addblocklabel($x_coord, $y_coord)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_addblocklabel($x_coord, $y_coord)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_addblocklabel($x_coord, $y_coord)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_addblocklabel($x_coord, $y_coord)')
 
         return cmd.substitute(x_coord=x, y_coord=y)
@@ -100,16 +106,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
 
         return cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
@@ -121,16 +127,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_deleteselected'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_deleteselected'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_deleteselected'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_deleteselected'
 
         return cmd
@@ -142,16 +148,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_deleteselectednodes'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_deleteselectednodes'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_deleteselectednodes'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_deleteselectednodes'
 
         return cmd
@@ -163,16 +169,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_deleteselectedlabels'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_deleteselectedlabels'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_deleteselectedlabels'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_deleteselectedlabels'
 
         return cmd
@@ -184,16 +190,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_deleteselectedsegments'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_deleteselectedsegments'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_deleteselectedsegments'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_deleteselectedsegments'
 
         return cmd
@@ -205,16 +211,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_deleteselectedarcsegments'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_deleteselectedarcsegments'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_deleteselectedarcsegments'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_deleteselectedarcsegments'
 
         return cmd
@@ -227,16 +233,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = 'mi_clearselected()'
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = 'ei_clearselected()'
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = 'hi_clearselected()'
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = 'ci_clearselected()'
 
         return cmd
@@ -248,16 +254,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectsegment($xp, $yp)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectsegment($xp, $yp)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectsegment($xp, $yp)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectsegment($xp, $yp)')
 
         return cmd.substitute(xp=x, yp=y)
@@ -269,16 +275,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectnode($xp, $yp)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectnode($xp, $yp)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectnode($xp, $yp)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectnode($xp, $yp)')
 
         return cmd.substitute(xp=x, yp=y)
@@ -290,16 +296,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectlabel($xp, $yp)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectlabel($xp, $yp)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectlabel($xp, $yp)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectlabel($xp, $yp)')
 
         return cmd.substitute(xp=x, yp=y)
@@ -314,16 +320,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectgroup($np)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectgroup($np)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectgroup($np)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectgroup($np)')
 
         return cmd.substitute(np=n)
@@ -339,16 +345,16 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectcircle($xp, $yp, $Rp, $Editmode)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectcircle($xp, $yp, $Rp, $Editmode)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectcircle($xp, $yp, $Rp, $Editmode)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectcircle($xp, $yp, $Rp, $Editmode)')
 
         return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
@@ -365,27 +371,20 @@ class FemmWriter:
         if self.field not in fields:
             raise ValueError('The physical field is not defined!')
 
-        if self.field == 'magnetic':
+        if self.field == kw_magnetic:
             cmd = Template('mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
 
-        if self.field == 'electrostatic':
+        if self.field == kw_electrostatic:
             cmd = Template('ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
 
-        if self.field == 'heat_flow':
+        if self.field == kw_heat_flow:
             cmd = Template('hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
 
-        if self.field == 'current_flow':
+        if self.field == kw_current_flow:
             cmd = Template('ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
 
         return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
-
-class Magnetostatic2FEMM(FemmWriter):
-    """ The goal of this class is to export and analyze a magnetostatic model into FEMM. """
-
-    # Problem definition commnads from FEMM MANUAL page 84.
-    # Magnetostatic-field
-    # -------------------
     def magnetic_problem(self, freq, units, type, precision=1e-6, depth=None, minangle=None, acsolver=None):
         """
          Definition of the magnetic problem, like probdef(0,'inches','axi',1e-8,0,30);
@@ -402,7 +401,7 @@ class Magnetostatic2FEMM(FemmWriter):
         The generated lua command has the following role:
 
          miprobdef(frequency,units,type,precision,(depth),(minangle),(acsolver) changes the problem definition.
-Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
+         Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
          length in the problem domain. Valid"units"en-tries are"inches","millimeters","centimeters","mils","meters,
          and"micrometers".Set the parameter problem type to"planar"for a 2-D planar problem, or to"axi"for
          anaxisymmetric problem. The precision parameter dictates the precision required by the solver.
