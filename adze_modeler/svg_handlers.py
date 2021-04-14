@@ -1,6 +1,7 @@
 import svgpathtools as svg
 import pygmsh
 import adze_modeler.geometry as geo
+import adze_modeler.objects as obj
 import cmath
 
 
@@ -23,17 +24,17 @@ def import_svg(svg_img, *args):
             if isinstance(seg, svg.Path):
                 for element in seg:
                     if isinstance(element, svg.Line):
-                        start = geo.Node(element.start.real, element.start.imag, id)
-                        end = geo.Node(element.end.real, element.end.imag, id + 1)
-                        imported_geo.add_line(geo.Line(start, end, id + 2))
+                        start = obj.Node(element.start.real, element.start.imag, id)
+                        end = obj.Node(element.end.real, element.end.imag, id + 1)
+                        imported_geo.add_line(obj.Line(start, end, id + 2))
                         id += 3
 
                     if isinstance(element, svg.CubicBezier):
-                        start = geo.Node(element.start.real, element.start.imag, id)
-                        control1 = geo.Node(element.control1.real, element.control1.imag, id + 1)
-                        control2 = geo.Node(element.control2.real, element.control2.imag, id + 2)
-                        end = geo.Node(element.end.real, element.end.imag, id + 3)
-                        imported_geo.add_cubic_bezier(geo.CubicBezier(start, control1, control2, end, id + 4))
+                        start = obj.Node(element.start.real, element.start.imag, id)
+                        control1 = obj.Node(element.control1.real, element.control1.imag, id + 1)
+                        control2 = obj.Node(element.control2.real, element.control2.imag, id + 2)
+                        end = obj.Node(element.end.real, element.end.imag, id + 3)
+                        imported_geo.add_cubic_bezier(obj.CubicBezier(start, control1, control2, end, id + 4))
                         id += 5
 
     imported_geo.merge_points()

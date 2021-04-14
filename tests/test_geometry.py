@@ -2,9 +2,8 @@ from unittest import TestCase
 from adze_modeler.geometry import Geometry
 from adze_modeler.gmsh import gmsh_writer
 from adze_modeler.svg_handlers import import_svg
-from adze_modeler.objects import Node, Line, CubicBezier
 from importlib_resources import files
-
+from adze_modeler.objects import Node, Line, CircleArc, CubicBezier
 
 class TestGeometry(TestCase):
 
