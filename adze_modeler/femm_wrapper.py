@@ -93,7 +93,23 @@ class FemmWriter():
 
         return cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
 
+    @staticmethod
+    def delete_selected(field='magnetic'):
+        """Delete all selected objects """
 
+        if field == 'magnetic':
+            cmd = 'mi_deleteselected'
+
+        if field == 'electrostatic':
+            cmd = 'ei_deleteselected'
+
+        if field == 'heat_flow':
+            cmd = 'hi_deleteselected'
+
+        if field == 'current_flow':
+            cmd = 'ci_deleteselected'
+
+        return cmd
 
         # Gmsh ASCII output uses `%.16g` for floating point values,
     # meshio uses same precision but exponential notation `%.16e`.

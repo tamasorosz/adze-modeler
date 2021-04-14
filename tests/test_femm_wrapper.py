@@ -35,3 +35,7 @@ class FemmTester(TestCase):
 
         res = FemmWriter.add_arc(x1, y1, x2, y2, 90.0, 1)
         self.assertEqual('mi_addarc(1.0, 0.0, 1.0, 1.0, 90.0, 1)', res)
+
+    def test_delete_selected(self):
+
+        self.assertEqual('mi_deleteselected', FemmWriter.delete_selected())
