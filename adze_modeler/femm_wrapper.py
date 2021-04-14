@@ -21,6 +21,8 @@ class FemmWriter():
         with open(file_name, 'w') as writer:
             ...
 
+    # object add remove commnads from FEMM MANUAL page 84.
+
     @staticmethod
     def add_node(x, y, field='magnetic'):
         """ adds a node to the given point (x,y)"""
@@ -111,7 +113,81 @@ class FemmWriter():
 
         return cmd
 
-        # Gmsh ASCII output uses `%.16g` for floating point values,
+    @staticmethod
+    def delete_selected_nodes(field='magnetic'):
+        """Delete all selected nodes, the object should be selected the node selection command. """
+
+        if field == 'magnetic':
+            cmd = 'mi_deleteselectednodes'
+
+        if field == 'electrostatic':
+            cmd = 'ei_deleteselectednodes'
+
+        if field == 'heat_flow':
+            cmd = 'hi_deleteselectednodes'
+
+        if field == 'current_flow':
+            cmd = 'ci_deleteselectednodes'
+
+        return cmd
+
+    @staticmethod
+    def delete_selected_labels(field='magnetic'):
+        """Delete all selected labels """
+
+        if field == 'magnetic':
+            cmd = 'mi_deleteselectedlabels'
+
+        if field == 'electrostatic':
+            cmd = 'ei_deleteselectedlabels'
+
+        if field == 'heat_flow':
+            cmd = 'hi_deleteselectedlabels'
+
+        if field == 'current_flow':
+            cmd = 'ci_deleteselectedlabels'
+
+        return cmd
+
+    @staticmethod
+    def delete_selected_segments(field='magnetic'):
+        """Delete all selected segments. """
+
+        if field == 'magnetic':
+            cmd = 'mi_deleteselectedlabels'
+
+        if field == 'electrostatic':
+            cmd = 'ei_deleteselectedlabels'
+
+        if field == 'heat_flow':
+            cmd = 'hi_deleteselectedlabels'
+
+        if field == 'current_flow':
+            cmd = 'ci_deleteselectedlabels'
+
+        return cmd
+
+    @staticmethod
+    def delete_delete_selected_arc_segments(field='magnetic'):
+        """Delete all selected arc segments. """
+
+        if field == 'magnetic':
+            cmd = 'mi_deleteselectedarcsegments'
+
+        if field == 'electrostatic':
+            cmd = 'ei_deleteselectedarcsegments'
+
+        if field == 'heat_flow':
+            cmd = 'hi_deleteselectedarcsegments'
+
+        if field == 'current_flow':
+            cmd = 'ci_deleteselectedarcsegments'
+
+        return cmd
+
+
+
+    # Gmsh ASCII output uses `%.16g` for floating point values,
     # meshio uses same precision but exponential notation `%.16e`.
     # def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
     #     """Writes a Gmsh msh file."""

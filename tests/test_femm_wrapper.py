@@ -37,5 +37,16 @@ class FemmTester(TestCase):
         self.assertEqual('mi_addarc(1.0, 0.0, 1.0, 1.0, 90.0, 1)', res)
 
     def test_delete_selected(self):
-
         self.assertEqual('mi_deleteselected', FemmWriter.delete_selected())
+
+    def test_delete_selected_nodes(self):
+        self.assertEqual('mi_deleteselectednodes', FemmWriter.delete_selected_nodes())
+
+    def test_delete_selected_labels(self):
+        self.assertEqual('mi_deleteselectedlabels', FemmWriter.delete_selected_labels())
+
+    def test_delete_selected_segments(self):
+        self.assertEqual('mi_deleteselectedsegments', FemmWriter.delete_selected_labels())
+
+    def test_delete_selected_arc_segments(self):
+        self.assertEqual('mi_deleteselectedarcsegments', FemmWriter.delete_delete_selected_arc_segments())
