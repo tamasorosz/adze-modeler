@@ -302,6 +302,29 @@ class FemmWriter():
 
         return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
 
+    @staticmethod
+    def select_rectangle(x1, y1, x2, y2, editmode, field='magnetic'):
+        """
+        This command selects objects within a rectangle definedby points (x1,y1) and (x2,y2).
+        If no editmode parameter is supplied, the current edit mode isused. If the editmode parameter is used,
+        0 denotes nodes, 2 denotes block labels, 2 denotessegments, 3 denotes arcs, and 4 specifies that all
+        entity types are to be selected.
+        """
+
+        if field == 'magnetic':
+            cmd = Template('mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+
+        if field == 'electrostatic':
+            cmd = Template('ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+
+        if field == 'heat_flow':
+            cmd = Template('hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+
+        if field == 'current_flow':
+            cmd = Template('ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+
+        return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
+
     # Gmsh ASCII output uses `%.16g` for floating point values,
     # meshio uses same precision but exponential notation `%.16e`.
     # def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):

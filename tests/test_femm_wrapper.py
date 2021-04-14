@@ -68,3 +68,6 @@ class FemmTester(TestCase):
 
     def test_select_circle(self):
         self.assertEqual('mi_selectcircle(1.0, 2.0, 0.4, 3)', FemmWriter.select_circle(1.0, 2.0, 0.4, 3))
+
+    def test_select_rectangle(self):
+        self.assertEqual('mi_selectrectangle(1.0,2.0,3.0,4.0,3)', FemmWriter.select_rectangle(1.0, 2.0, 3.0, 4.0, 3))
