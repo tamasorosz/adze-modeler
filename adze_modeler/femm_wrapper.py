@@ -1,6 +1,9 @@
 """
 The goal of this module is to write out the given geometry into a FEMM's lua script.
 The code generated one snapshot from the created model, which can be run during the Optimization.
+
+The original FEMM code has separate scripting commands for the geometry generation in different subfields
+
 """
 
 from adze_modeler.geometry import Geometry
@@ -376,18 +379,30 @@ class FemmWriter:
 
         return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
+
+class Magnetostatic2FEMM(FemmWriter):
+    """ The goal of this class is to export and analyze a magnetostatic model into FEMM. """
+
     # Problem definition commnads from FEMM MANUAL page 84.
     # Magnetostatic-field
     # -------------------
     def magnetic_problem(self, freq, units, type, precision=1e-6, depth=None, minangle=None, acsolver=None):
         """
-         :param freq: Frequency in Hertz
-         :param units: "inches","millimeters","centimeters","mils","meters, and"micrometers"
-         :param type: "planar", "axi"
-         :param precision: 1e-8
+         Definition of the magnetic problem, like probdef(0,'inches','axi',1e-8,0,30);
 
-         miprobdef(frequency,units,type,precision,(depth),(minangle),(acsolver) changesthe problem definition.
-         Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
+         :param freq: Frequency in Hertz (required)
+         :param units: "inches","millimeters","centimeters","mils","meters, and"micrometers" (required)
+         :param type: "planar", "axi" (required)
+         :param precision: 1e-8 (required)
+         :param depth: depth of the analysis (not mandatory)
+         :param minangle: sent to the mesh generator to define the minimum angle of the meshing triangles(not mandatory)
+         :param acsolver: the selected acsolver for the problem (not mandatory)
+
+
+        The generated lua command has the following role:
+
+         miprobdef(frequency,units,type,precision,(depth),(minangle),(acsolver) changes the problem definition.
+Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
          length in the problem domain. Valid"units"en-tries are"inches","millimeters","centimeters","mils","meters,
          and"micrometers".Set the parameter problem type to"planar"for a 2-D planar problem, or to"axi"for
          anaxisymmetric problem. The precision parameter dictates the precision required by the solver.
