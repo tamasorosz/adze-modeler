@@ -7,6 +7,8 @@ The original FEMM code has separate scripting commands for the geometry generati
 """
 import os
 from string import Template
+from sys import platform
+import subprocess
 
 # keywords
 kw_current_flow = "current_flow"
@@ -439,35 +441,28 @@ class FemmWriter:
 
         return cmd.substitute(flag=flag)
 
+
+class FemmExecutor:
+    # default value of the femm path under linux and under windows
+    femm_path_linux = "~/.wine/drive_c/femm42/bin/femm.exe"
+    femm_path_windows = r"C:\FEMM42\bin\femm.exe"
+
     def run_femm(self, script_file):
         """This function runs the femm simulation via filelink"""
 
-        self.script_file = ntpath.basename(script_file)
-        self.femm_command = "wine ~/.wine/drive_c/femm42/bin/femm.exe"
+        self.script_file = os.path.basename(script_file)
 
-        lua_path = os.path.abspath(self.script_file)
+        # under linux we are using wine to run FEMM
+        if platform == 'linux':
+            self.femm_command = "wine " + self.femm_path_linux
 
-        if os.path.isfile(lua_path) and platform == "linux":
-            arg = '"' + os.popen('winepath -w "' + lua_path + '"').read().strip() + '"'
+            lua_path = os.path.abspath(self.script_file)
 
-    def eval(self, individual):
-        super().eval(individual)
+            arg = None
+            if os.path.isfile(lua_path) and platform == "linux":
+                arg = '"' + os.popen('winepath -w "' + lua_path + '"').read().strip() + '"'
 
-        param_names_string = Executor._join_parameters_names(self.problem.parameters)
-        param_values_string = Executor._join_parameters_values(individual.vector)
-
-        # cmd_string = self.femm_command + ' -lua-script={} -lua-var={} -lua-var={} -windowhide'.format(arg, 'radius=200',
-        #                                                                                              'c=42')
-        cmd_string = self.femm_command + f" -lua-script={arg}"
-
-        params = param_names_string.split(",")
-        values = param_values_string.split(",")
-        #
-        for i in range(len(params)):
-            temp = str(params[i]) + "=" + str(values[i])
-            cmd_string += f" -lua-var={temp}"
-
-        try:
+            cmd_string = self.femm_command + f" -lua-script={arg}"
 
             out = subprocess.run(cmd_string, shell=True, stdout=subprocess.PIPE)
 
@@ -476,52 +471,82 @@ class FemmWriter:
                 if out.stderr is not None:
                     err = f"Cannot run FEMM.\n\n {out.stderr}"
 
-                self.problem.logger.error(err)
-                raise RuntimeError(err)
+                # self.problem.logger.error(err)
+                # raise RuntimeError(err)
 
-            result = self.parse_results(self.output_files, individual)
-            return result
 
-        except Exception as e:
-            err = f"Cannot run FEMM with wine.\n\n {e}"
-            self.problem.logger.error(err)
-            raise RuntimeError(err)
+# def eval(self, individual):
+#     super().eval(individual)
+#
+#     param_names_string = Executor._join_parameters_names(self.problem.parameters)
+#     param_values_string = Executor._join_parameters_values(individual.vector)
+#
+#     # cmd_string = self.femm_command + ' -lua-script={} -lua-var={} -lua-var={} -windowhide'.format(arg, 'radius=200',
+#     #                                                                                              'c=42')
+#     cmd_string = self.femm_command + f" -lua-script={arg}"
+#
+#     params = param_names_string.split(",")
+#     values = param_values_string.split(",")
+#     #
+#     for i in range(len(params)):
+#         temp = str(params[i]) + "=" + str(values[i])
+#         cmd_string += f" -lua-var={temp}"
+#
+#     try:
+#
+#         out = subprocess.run(cmd_string, shell=True, stdout=subprocess.PIPE)
+#
+#         if out.returncode != 0:
+#             err = "Unknown error"
+#             if out.stderr is not None:
+#                 err = f"Cannot run FEMM.\n\n {out.stderr}"
+#
+#             self.problem.logger.error(err)
+#             raise RuntimeError(err)
+#
+#         result = self.parse_results(self.output_files, individual)
+#         return result
+#
+#     except Exception as e:
+#         err = f"Cannot run FEMM with wine.\n\n {e}"
+#         self.problem.logger.error(err)
+#         raise RuntimeError(err)
 
-    # eiprobdef(units,type,precision,(depth),(minangle))changes the problem defi-nition.
-    # The units parameter specifies the units used for measuring length in the problemdomain.
-    # Valid"units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
-    # Setproblemtypeto"planar"for a 2-D planar problem,or to"axi"for an axisymmetric problem.
-    # The precisionparameter dictates the precisionrequired by the solver. For example, entering 1.E-8 requires the
-    # RMS of the residual to beless than 10−8. A fourth parameter, representing the depth of the problem in the
-    # into-the-page direction for 2-D planar problems, can also be specifiedfor planar problems.
-    # A sixthparameter represents the minimum angle constraint sent to the mesh generator.
+# eiprobdef(units,type,precision,(depth),(minangle))changes the problem defi-nition.
+# The units parameter specifies the units used for measuring length in the problemdomain.
+# Valid"units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
+# Setproblemtypeto"planar"for a 2-D planar problem,or to"axi"for an axisymmetric problem.
+# The precisionparameter dictates the precisionrequired by the solver. For example, entering 1.E-8 requires the
+# RMS of the residual to beless than 10−8. A fourth parameter, representing the depth of the problem in the
+# into-the-page direction for 2-D planar problems, can also be specifiedfor planar problems.
+# A sixthparameter represents the minimum angle constraint sent to the mesh generator.
 
-    # hiprobdef(units,type,precision,(depth),(minangle),(prevsoln),(timestep))changes the problem definition.
-    # Theunits parameter specifies the units used for measur-ing length in the problem domain.
-    # Valid "units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
-    # Setproblemtypeto"planar"for a 2-D planar problem, or to"axi"for an axisymmetric problem.
-    # The precision parameter dictates the precision required by the solver. For example, entering 1.E-8 requires the
-    # RMS of the residual to be less than 10−8. A fourth parameter, representing the depthof the problem in the
-    # into-the-page direction for 2-D planarproblems, can also be specifiedfor planar problems.
-    # A fifth parameter represents the minimum angle constraint sent to themesh generator. The sixth parameter
-    # indicates the solutionfrom the previous time step to beused in time-transient problems. The seventh parameter
-    # is the time step assumed for timetransient problems.
+# hiprobdef(units,type,precision,(depth),(minangle),(prevsoln),(timestep))changes the problem definition.
+# Theunits parameter specifies the units used for measur-ing length in the problem domain.
+# Valid "units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
+# Setproblemtypeto"planar"for a 2-D planar problem, or to"axi"for an axisymmetric problem.
+# The precision parameter dictates the precision required by the solver. For example, entering 1.E-8 requires the
+# RMS of the residual to be less than 10−8. A fourth parameter, representing the depthof the problem in the
+# into-the-page direction for 2-D planarproblems, can also be specifiedfor planar problems.
+# A fifth parameter represents the minimum angle constraint sent to themesh generator. The sixth parameter
+# indicates the solutionfrom the previous time step to beused in time-transient problems. The seventh parameter
+# is the time step assumed for timetransient problems.
 
-    # Gmsh ASCII output uses `%.16g` for floating point values,
-    # meshio uses same precision but exponential notation `%.16e`.
-    # def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
-    #     """Writes a Gmsh msh file."""
-    #     try:
-    #         writer = _writers[fmt_version]
-    #     except KeyError:
-    #         try:
-    #             writer = _writers[fmt_version]
-    #         except KeyError:
-    #             raise WriteError(
-    #                 "Need mesh format in {} (got {})".format(
-    #                     sorted(_writers.keys()), fmt_version
-    #                 )
-    #             )
+# Gmsh ASCII output uses `%.16g` for floating point values,
+# meshio uses same precision but exponential notation `%.16e`.
+# def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
+#     """Writes a Gmsh msh file."""
+#     try:
+#         writer = _writers[fmt_version]
+#     except KeyError:
+#         try:
+#             writer = _writers[fmt_version]
+#         except KeyError:
+#             raise WriteError(
+#                 "Need mesh format in {} (got {})".format(
+#                     sorted(_writers.keys()), fmt_version
+#                 )
+#             )
 
 
 """
