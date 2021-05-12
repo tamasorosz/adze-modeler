@@ -4,14 +4,14 @@ A general geometrical shape can defined by the following objects:
     Nodes (Points), Lines, Circle Arcs, Cubic Bezeirs
 """
 
-class Geometry():
 
+class Geometry:
     def __init__(self):
         self.nodes = []
         self.lines = []
         self.circle_arcs = []
         self.cubic_beziers = []
-        self.epsilon = 1.e-5
+        self.epsilon = 1.0e-5
 
     def add_object(self):
         return
@@ -64,19 +64,19 @@ class Geometry():
 
     def __repr__(self):
         msg = ""
-        msg += str("\n Nodes: \n -----------------------\n")
+        msg += "\n Nodes: \n -----------------------\n"
         for node in self.nodes:
             msg += str(node) + "\n"
 
-        msg += str("\n Lines: \n -----------------------\n")
+        msg += "\n Lines: \n -----------------------\n"
         for line in self.lines:
             msg += str(line) + "\n"
 
-        msg += str("\n Circle Arcs: \n -----------------------\n")
+        msg += "\n Circle Arcs: \n -----------------------\n"
         for arc in self.circle_arcs:
             msg += str(arc) + "\n"
 
-        msg += str("\n CubicBezier: \n -----------------------\n")
+        msg += "\n CubicBezier: \n -----------------------\n"
         for cubicbezier in self.cubic_beziers:
             msg += str(cubicbezier) + "\n"
 

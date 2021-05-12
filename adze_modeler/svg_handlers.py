@@ -1,11 +1,11 @@
-import svgpathtools as svg
-import pygmsh
 import adze_modeler.geometry as geo
 import adze_modeler.objects as obj
+import pygmsh
+import svgpathtools as svg
 
 
 def import_svg(svg_img, *args):
-    """ Imports the svg file into a new geo object. The function gives an automatic id to the function
+    """Imports the svg file into a new geo object. The function gives an automatic id to the function
 
     svg_img: the name of the file, which contains the imported svg image
     return: gives back a new geometry

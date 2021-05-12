@@ -1,16 +1,15 @@
 import pygmsh.geo as gmsh
-from adze_modeler.objects import Node, Line, CircleArc, CubicBezier
-from adze_modeler.geometry import Geometry
+
 
 def node_gmsh_point_distance(node, point):
     dx = node.x - point.x[0]
     dy = node.y - point.x[1]
 
-    return (dx ** 2. + dy ** 2.) ** 0.5
+    return (dx ** 2.0 + dy ** 2.0) ** 0.5
 
 
 def gmsh_writer(nodes, lines, arcs, cubic_beziers):
-    lcar = 5.
+    lcar = 5.0
     epsilon = 1e-6
     with gmsh.Geometry() as geom:
         # add nodes

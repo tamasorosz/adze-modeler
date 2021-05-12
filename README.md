@@ -16,4 +16,4 @@
 
 Why the name?
 -------------
-Adze is a simple and versatile tool, which is used from the ancient times for wood carving. This is the similarity with the base concept of this tool, which is 
+Adze is a simple and versatile tool, which is used from the ancient times for wood carving. This is the similarity with the base concept of this tool, which is

@@ -1,30 +1,31 @@
-from abc import abstractmethod, ABCMeta
-from adze_modeler.geometry import Geometry
+from abc import ABCMeta
+from abc import abstractmethod
 from types import SimpleNamespace
+
+from adze_modeler.geometry import Geometry
 
 
 class Model(metaclass=ABCMeta):
-    """This class contains the full model = geometry + boundary conditions + material parameters """
+    """This class contains the full model = geometry + boundary conditions + material parameters"""
 
     def __init__(self):
         self.geometry = Geometry
         self.materials = []
         self.labels = []
         self.bcs = []
-        self.epsilon = 1.e-5
+        self.epsilon = 1.0e-5
 
     @abstractmethod
     def create_model(self):
         pass
 
 
-class PhysicalModel():
+class PhysicalModel:
     materials = []
     boundary_conditions = []
 
 
 class Label(SimpleNamespace):
-
     def __init__(self, node_id, label_id, material):
         self.node_id = node_id
         self.label_id = label_id
@@ -42,7 +43,6 @@ class FemObjects(SimpleNamespace):
 
 
 class Rectangle(FemObjects):
-
     def __init__(self, bottom_left: tuple, width, height, material):
         self.width = width
         self.height = height
@@ -50,7 +50,6 @@ class Rectangle(FemObjects):
 
 
 class BoundaryCondition(SimpleNamespace):
-
     def __init__(self, name, type, value):
         self.name = name
         self.type = type
@@ -58,8 +57,21 @@ class BoundaryCondition(SimpleNamespace):
 
 
 if __name__ == "__main__":
-    cu = Material(name="copper", mu_x=1, mu_y=1, Hc=0, J=1e6, C_duct=0, L_amd=0, Phi_hmax=0, lam_fill=1., Phi_hx=0,
-                  Phi_hy=0., N_strands=1., WireD=1.)
+    cu = Material(
+        name="copper",
+        mu_x=1,
+        mu_y=1,
+        Hc=0,
+        J=1e6,
+        C_duct=0,
+        L_amd=0,
+        Phi_hmax=0,
+        lam_fill=1.0,
+        Phi_hx=0,
+        Phi_hy=0.0,
+        N_strands=1.0,
+        WireD=1.0,
+    )
 
     print(cu)
     # mi_addmaterial("materialname", mux, muy, Hc, J, Cduct, Lamd, Phihmax,lamfill, LamType, Phihx, Phihy,NStrands,WireD)

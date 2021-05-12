@@ -1,18 +1,20 @@
-from unittest import TestCase
-from adze_modeler.objects import Node, Line, CubicBezier
 from math import pi
+from unittest import TestCase
+
+from adze_modeler.objects import CubicBezier
+from adze_modeler.objects import Line
+from adze_modeler.objects import Node
 
 
 class TestNodeOperations(TestCase):
-
     def test_node_init(self):
         # initialize without an id number
-        self.assertEqual((1., 1.), Node(1., 1.).as_tuple())
+        self.assertEqual((1.0, 1.0), Node(1.0, 1.0).as_tuple())
 
     def test_rotate_a_node(self):
         a = Node(1.0, 0.0)
         c = a.rotate(pi / 2)
-        self.assertEqual((0., 1.), c.as_tuple())
+        self.assertEqual((0.0, 1.0), c.as_tuple())
 
     def test_rotate_node_around_a_point(self):
         a = Node(1.0, 0.0)
@@ -23,14 +25,14 @@ class TestNodeOperations(TestCase):
 
     def test_strings(self):
         a = Node(1.0, 0.0)
-        self.assertEqual('(1.0, 0.0, id=None,label=None)', str(a))
+        self.assertEqual("(1.0, 0.0, id=None,label=None)", str(a))
 
     def test_distance(self):
         a = Node(1.0, 0.0)
         b = Node(0.5, 0.0)
         c = a + b
         d = a - b
-        e = a * 2.
+        e = a * 2.0
         self.assertEqual((1.5, 0.0), c.as_tuple())
         self.assertEqual((0.5, 0.0), d.as_tuple())
         self.assertEqual((2.0, 0.0), e.as_tuple())
@@ -49,7 +51,8 @@ class TestLine(TestCase):
 
         # repr string
         self.assertIn(
-            'Line(Node(1.0, 0.0, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label=\'test\')', str(l))
+            "Line(Node(1.0, 0.0, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label='test')", str(l)
+        )
 
 
 class TestCubicBezier(TestCase):
@@ -67,6 +70,7 @@ class TestCubicBezier(TestCase):
         self.assertEqual(b, cb.end_pt)
 
         self.assertIn(
-            'CubicBezier(Node(1.0, 0.0, id=None,label=None), Node(0.6, 0.1, id=None,label=None), Node(0.7, 0.2, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label=\'test\')',
-            str(cb))
+            "CubicBezier(Node(1.0, 0.0, id=None,label=None), Node(0.6, 0.1, id=None,label=None), Node(0.7, 0.2, id=None,label=None), Node(0.5, 0.0, id=None,label=None), id=1,label='test')",
+            str(cb),
+        )
         print(cb)

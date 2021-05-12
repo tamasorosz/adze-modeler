@@ -27,10 +27,10 @@ class Node:
         return Node(self.x * scalar, self.y * scalar)
 
     def __str__(self):
-        return "(%s, %s, id=%s,label=%s)" % (self.x, self.y, self.id, self.label)
+        return f"({self.x}, {self.y}, id={self.id},label={self.label})"
 
     def __repr__(self):
-        return "%s(%r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.x, self.y, self.id, self.label)
+        return f"{self.__class__.__name__}({self.x!r}, {self.y!r}, id={self.id!r},label={self.label!r})"
 
     def length(self):
         return math.sqrt(self.x ** 2 + self.y ** 2)
@@ -68,7 +68,7 @@ class Node:
         return Node(round(x, self.precision), round(y, self.precision))
 
     def rotate_about(self, p, theta):
-        """ Rotate counter-clockwise around a point, by theta degrees. The new position is returned as a new Point. """
+        """Rotate counter-clockwise around a point, by theta degrees. The new position is returned as a new Point."""
         result = self.clone()
         result.move_xy(-p.x, -p.y)
         result = result.rotate(theta)
@@ -77,7 +77,7 @@ class Node:
 
 
 class Line:
-    """ A directed line, which is defined by the (start -> end) points """
+    """A directed line, which is defined by the (start -> end) points"""
 
     def __init__(self, start_pt, end_pt, id=None, label=None):
         self.start_pt = start_pt
@@ -86,11 +86,11 @@ class Line:
         self.label = label
 
     def __repr__(self):
-        return "%s(%r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.start_pt, self.end_pt, self.id, self.label)
+        return f"{self.__class__.__name__}({self.start_pt!r}, {self.end_pt!r}, id={self.id!r},label={self.label!r})"
 
 
 class CircleArc:
-    """ A directed line, which is defined by the (start -> end) points """
+    """A directed line, which is defined by the (start -> end) points"""
 
     def __init__(self, start_pt, center_pt, end_pt, id=None, label=None):
         self.start_pt = start_pt
@@ -100,12 +100,12 @@ class CircleArc:
         self.label = label
 
     def __repr__(self):
-        return "%s(%r, %r, %r, id=%r,label=%r)" % (
-        self.__class__.__name__, self.start_pt, self.center_pt, self.end_pt, self.id, self.label)
+        return "{}({!r}, {!r}, {!r}, id={!r},label={!r})".format(
+            self.__class__.__name__, self.start_pt, self.center_pt, self.end_pt, self.id, self.label
+        )
 
 
 class CubicBezier:
-
     def __init__(self, start_pt, control1, control2, end_pt, id=None, label=None):
         self.start_pt = start_pt
         self.control1 = control1
@@ -115,5 +115,6 @@ class CubicBezier:
         self.label = label
 
     def __repr__(self):
-        return "%s(%r, %r, %r, %r, id=%r,label=%r)" % (self.__class__.__name__, self.start_pt, self.control1,
-                                                       self.control2, self.end_pt, self.id, self.label)
+        return "{}({!r}, {!r}, {!r}, {!r}, id={!r},label={!r})".format(
+            self.__class__.__name__, self.start_pt, self.control1, self.control2, self.end_pt, self.id, self.label
+        )

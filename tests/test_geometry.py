@@ -1,12 +1,16 @@
 from unittest import TestCase
+
 from adze_modeler.geometry import Geometry
 from adze_modeler.gmsh import gmsh_writer
+from adze_modeler.objects import CircleArc
+from adze_modeler.objects import CubicBezier
+from adze_modeler.objects import Line
+from adze_modeler.objects import Node
 from adze_modeler.svg_handlers import import_svg
 from importlib_resources import files
-from adze_modeler.objects import Node, Line, CircleArc, CubicBezier
+
 
 class TestGeometry(TestCase):
-
     def test_initialization(self):
         geo = Geometry()
 
@@ -54,16 +58,15 @@ class TestGeometry(TestCase):
 
 
 class TestMeshing(TestCase):
-
     def test_mesh_the_triangle(self):
-        path = files('examples.triangle').joinpath('triangle.svg')
+        path = files("examples.triangle").joinpath("triangle.svg")
         print(path)
         geo = import_svg(path.as_posix())
         print(geo)
         gmsh_writer(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)
 
     def test_mesh_the_owl(self):
-        path = files('examples.owl').joinpath('owl-shape.svg')
+        path = files("examples.owl").joinpath("owl-shape.svg")
         geo = import_svg(path.as_posix())
         print(geo)
         gmsh_writer(geo.nodes, geo.lines, geo.circle_arcs, geo.cubic_beziers)

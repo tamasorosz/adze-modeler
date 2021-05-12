@@ -5,16 +5,14 @@ The code generated one snapshot from the created model, which can be run during 
 The original FEMM code has separate scripting commands for the geometry generation in different subfields
 
 """
-
-from adze_modeler.geometry import Geometry
+import os
 from string import Template
 
 # keywords
-
-kw_current_flow = 'current_flow'
-kw_electrostatic = 'electrostatic'
-kw_magnetic = 'magnetic'
-kw_heat_flow = 'heat_flow'
+kw_current_flow = "current_flow"
+kw_electrostatic = "electrostatic"
+kw_magnetic = "magnetic"
+kw_heat_flow = "heat_flow"
 
 fields = [kw_electrostatic, kw_magnetic, kw_current_flow, kw_heat_flow]
 
@@ -23,76 +21,76 @@ class FemmWriter:
     field = kw_magnetic
 
     def write(self, model, file_name):
-        """ Generate a runnable lua-script for a FEMM calculation.
+        """Generate a runnable lua-script for a FEMM calculation.
 
         :param model: represents a geometry in the adze-modeler
         :param file_name: the code (re)writes the snapshot from the created geometry to the given code
         """
 
-        with open(file_name, 'w') as writer:
+        with open(file_name, "w") as writer:
             ...
 
     # object add remove commnads from FEMM MANUAL page 84.
     def add_node(self, x, y):
-        """ adds a node to the given point (x,y)"""
+        """adds a node to the given point (x,y)"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_addnode($x_coord, $y_coord)')
+            cmd = Template("mi_addnode($x_coord, $y_coord)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_addnode($x_coord, $y_coord)')
+            cmd = Template("ei_addnode($x_coord, $y_coord)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_addnode($x_coord, $y_coord)')
+            cmd = Template("hi_addnode($x_coord, $y_coord)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_addnode($x_coord, $y_coord)')
+            cmd = Template("ci_addnode($x_coord, $y_coord)")
 
         return cmd.substitute(x_coord=x, y_coord=y)
 
     def add_segment(self, x1, y1, x2, y2):
-        """ Add a new line segment from node closest to (x1,y1) tonode closest to (x2,y2) """
+        """Add a new line segment from node closest to (x1,y1) tonode closest to (x2,y2)"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+            cmd = Template("mi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+            cmd = Template("ei_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+            cmd = Template("hi_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)')
+            cmd = Template("ci_addsegment($x1_coord, $y1_coord, $x2_coord, $y2_coord)")
 
         return cmd.substitute(x1_coord=x1, y1_coord=y1, x2_coord=x2, y2_coord=y2)
 
     def add_blocklabel(self, x, y):
-        """ Add a new block label at (x,y) """
+        """Add a new block label at (x,y)"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_addblocklabel($x_coord, $y_coord)')
+            cmd = Template("mi_addblocklabel($x_coord, $y_coord)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_addblocklabel($x_coord, $y_coord)')
+            cmd = Template("ei_addblocklabel($x_coord, $y_coord)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_addblocklabel($x_coord, $y_coord)')
+            cmd = Template("hi_addblocklabel($x_coord, $y_coord)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_addblocklabel($x_coord, $y_coord)')
+            cmd = Template("ci_addblocklabel($x_coord, $y_coord)")
 
         return cmd.substitute(x_coord=x, y_coord=y)
 
@@ -104,209 +102,209 @@ class FemmWriter:
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+            cmd = Template("mi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+            cmd = Template("ei_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+            cmd = Template("hi_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)')
+            cmd = Template("ci_addarc($x_1, $y_1, $x_2, $y_2, $angle, $maxseg)")
 
         return cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
 
     def delete_selected(self):
-        """Delete all selected objects """
+        """Delete all selected objects"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_deleteselected'
+            cmd = "mi_deleteselected"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_deleteselected'
+            cmd = "ei_deleteselected"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_deleteselected'
+            cmd = "hi_deleteselected"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_deleteselected'
+            cmd = "ci_deleteselected"
 
         return cmd
 
     def delete_selected_nodes(self):
-        """Delete all selected nodes, the object should be selected the node selection command. """
+        """Delete all selected nodes, the object should be selected the node selection command."""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_deleteselectednodes'
+            cmd = "mi_deleteselectednodes"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_deleteselectednodes'
+            cmd = "ei_deleteselectednodes"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_deleteselectednodes'
+            cmd = "hi_deleteselectednodes"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_deleteselectednodes'
+            cmd = "ci_deleteselectednodes"
 
         return cmd
 
     def delete_selected_labels(self):
-        """Delete all selected labels """
+        """Delete all selected labels"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_deleteselectedlabels'
+            cmd = "mi_deleteselectedlabels"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_deleteselectedlabels'
+            cmd = "ei_deleteselectedlabels"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_deleteselectedlabels'
+            cmd = "hi_deleteselectedlabels"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_deleteselectedlabels'
+            cmd = "ci_deleteselectedlabels"
 
         return cmd
 
     def delete_selected_segments(self):
-        """Delete all selected segments. """
+        """Delete all selected segments."""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_deleteselectedsegments'
+            cmd = "mi_deleteselectedsegments"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_deleteselectedsegments'
+            cmd = "ei_deleteselectedsegments"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_deleteselectedsegments'
+            cmd = "hi_deleteselectedsegments"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_deleteselectedsegments'
+            cmd = "ci_deleteselectedsegments"
 
         return cmd
 
     def delete_delete_selected_arc_segments(self):
-        """Delete all selected arc segments. """
+        """Delete all selected arc segments."""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_deleteselectedarcsegments'
+            cmd = "mi_deleteselectedarcsegments"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_deleteselectedarcsegments'
+            cmd = "ei_deleteselectedarcsegments"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_deleteselectedarcsegments'
+            cmd = "hi_deleteselectedarcsegments"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_deleteselectedarcsegments'
+            cmd = "ci_deleteselectedarcsegments"
 
         return cmd
 
     # object selection commnads from FEMM MANUAL page 84.
     def clear_selected(self):
-        """ Clear all selected nodes, blocks, segments and arc segments. """
+        """Clear all selected nodes, blocks, segments and arc segments."""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = 'mi_clearselected()'
+            cmd = "mi_clearselected()"
 
         if self.field == kw_electrostatic:
-            cmd = 'ei_clearselected()'
+            cmd = "ei_clearselected()"
 
         if self.field == kw_heat_flow:
-            cmd = 'hi_clearselected()'
+            cmd = "hi_clearselected()"
 
         if self.field == kw_current_flow:
-            cmd = 'ci_clearselected()'
+            cmd = "ci_clearselected()"
 
         return cmd
 
     def select_segment(self, x, y):
-        """Select the line segment closest to (x,y) """
+        """Select the line segment closest to (x,y)"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectsegment($xp, $yp)')
+            cmd = Template("mi_selectsegment($xp, $yp)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectsegment($xp, $yp)')
+            cmd = Template("ei_selectsegment($xp, $yp)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectsegment($xp, $yp)')
+            cmd = Template("hi_selectsegment($xp, $yp)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectsegment($xp, $yp)')
+            cmd = Template("ci_selectsegment($xp, $yp)")
 
         return cmd.substitute(xp=x, yp=y)
 
     def select_node(self, x, y):
-        """Select node closest to (x,y), Returns the coordinates ofthe se-lected node """
+        """Select node closest to (x,y), Returns the coordinates ofthe se-lected node"""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectnode($xp, $yp)')
+            cmd = Template("mi_selectnode($xp, $yp)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectnode($xp, $yp)')
+            cmd = Template("ei_selectnode($xp, $yp)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectnode($xp, $yp)')
+            cmd = Template("hi_selectnode($xp, $yp)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectnode($xp, $yp)')
+            cmd = Template("ci_selectnode($xp, $yp)")
 
         return cmd.substitute(xp=x, yp=y)
 
     def select_label(self, x, y):
-        """ Select the label closet to (x,y). Returns the coordinates of the selected label. """
+        """Select the label closet to (x,y). Returns the coordinates of the selected label."""
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectlabel($xp, $yp)')
+            cmd = Template("mi_selectlabel($xp, $yp)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectlabel($xp, $yp)')
+            cmd = Template("ei_selectlabel($xp, $yp)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectlabel($xp, $yp)')
+            cmd = Template("hi_selectlabel($xp, $yp)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectlabel($xp, $yp)')
+            cmd = Template("ci_selectlabel($xp, $yp)")
 
         return cmd.substitute(xp=x, yp=y)
 
@@ -318,19 +316,19 @@ class FemmWriter:
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectgroup($np)')
+            cmd = Template("mi_selectgroup($np)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectgroup($np)')
+            cmd = Template("ei_selectgroup($np)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectgroup($np)')
+            cmd = Template("hi_selectgroup($np)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectgroup($np)')
+            cmd = Template("ci_selectgroup($np)")
 
         return cmd.substitute(np=n)
 
@@ -343,19 +341,19 @@ class FemmWriter:
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectcircle($xp, $yp, $Rp, $Editmode)')
+            cmd = Template("mi_selectcircle($xp, $yp, $Rp, $Editmode)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectcircle($xp, $yp, $Rp, $Editmode)')
+            cmd = Template("ei_selectcircle($xp, $yp, $Rp, $Editmode)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectcircle($xp, $yp, $Rp, $Editmode)')
+            cmd = Template("hi_selectcircle($xp, $yp, $Rp, $Editmode)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectcircle($xp, $yp, $Rp, $Editmode)')
+            cmd = Template("ci_selectcircle($xp, $yp, $Rp, $Editmode)")
 
         return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
 
@@ -369,19 +367,19 @@ class FemmWriter:
 
         cmd = None
         if self.field not in fields:
-            raise ValueError('The physical field is not defined!')
+            raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template('mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+            cmd = Template("mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
 
         if self.field == kw_electrostatic:
-            cmd = Template('ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+            cmd = Template("ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
 
         if self.field == kw_heat_flow:
-            cmd = Template('hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+            cmd = Template("hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
 
         if self.field == kw_current_flow:
-            cmd = Template('ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)')
+            cmd = Template("ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
 
         return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
@@ -417,26 +415,77 @@ class FemmWriter:
         if self.field != kw_magnetic:
             raise ValueError("Set the magnetic field parameter!")
 
-        cmd = Template('mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver')
-        return cmd.substitute(frequency=freq, units=unit, type=type, precision=precision, depth=depth,
-                              minangle=minangle, )
+        cmd = Template("mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver")
+        return cmd.substitute(
+            frequency=freq,
+            units=unit,
+            type=type,
+            precision=precision,
+            depth=depth,
+            minangle=minangle,
+        )
 
     def run_analysis(self, flag=1):
         """
-         Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
-         minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
-         If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
-         the main window is minimized, the solver runs minimized, too.
+        Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
+        minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
+        If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
+        the main window is minimized, the solver runs minimized, too.
+
+        :param flag: 0 or 1, 1 is the default here (silent mode)
         """
         if self.field == kw_magnetic:
-            cmd = Template('mi_analyze($flag)')
+            cmd = Template("mi_analyze($flag)")
 
         return cmd.substitute(flag=flag)
 
-    def run_femm(self):
-        """This function runs the femm simulation with the selected file."""
+    def run_femm(self, script_file):
+        """This function runs the femm simulation via filelink"""
 
-        return
+        self.script_file = ntpath.basename(script_file)
+        self.femm_command = "wine ~/.wine/drive_c/femm42/bin/femm.exe"
+
+        lua_path = os.path.abspath(self.script_file)
+
+        if os.path.isfile(lua_path) and platform == "linux":
+            arg = '"' + os.popen('winepath -w "' + lua_path + '"').read().strip() + '"'
+
+    def eval(self, individual):
+        super().eval(individual)
+
+        param_names_string = Executor._join_parameters_names(self.problem.parameters)
+        param_values_string = Executor._join_parameters_values(individual.vector)
+
+        # cmd_string = self.femm_command + ' -lua-script={} -lua-var={} -lua-var={} -windowhide'.format(arg, 'radius=200',
+        #                                                                                              'c=42')
+        cmd_string = self.femm_command + f" -lua-script={arg}"
+
+        params = param_names_string.split(",")
+        values = param_values_string.split(",")
+        #
+        for i in range(len(params)):
+            temp = str(params[i]) + "=" + str(values[i])
+            cmd_string += f" -lua-var={temp}"
+
+        try:
+
+            out = subprocess.run(cmd_string, shell=True, stdout=subprocess.PIPE)
+
+            if out.returncode != 0:
+                err = "Unknown error"
+                if out.stderr is not None:
+                    err = f"Cannot run FEMM.\n\n {out.stderr}"
+
+                self.problem.logger.error(err)
+                raise RuntimeError(err)
+
+            result = self.parse_results(self.output_files, individual)
+            return result
+
+        except Exception as e:
+            err = f"Cannot run FEMM with wine.\n\n {e}"
+            self.problem.logger.error(err)
+            raise RuntimeError(err)
 
     # eiprobdef(units,type,precision,(depth),(minangle))changes the problem defi-nition.
     # The units parameter specifies the units used for measuring length in the problemdomain.
