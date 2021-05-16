@@ -1,16 +1,13 @@
-import unittest
 from unittest import TestCase
 
-from adze_modeler.femm_wrapper import FemmExecutor
 from adze_modeler.femm_wrapper import FemmWriter
 from adze_modeler.femm_wrapper import kw_current_flow
 from adze_modeler.femm_wrapper import kw_electrostatic
 from adze_modeler.femm_wrapper import kw_heat_flow
-from adze_modeler.femm_wrapper import kw_magnetic
-from importlib_resources import files
 
 
 class FemmTester(TestCase):
+
     def test_not_defined_writer(self):
         writer = FemmWriter()
         writer.field = None
@@ -265,3 +262,6 @@ class FemmTester(TestCase):
 
         fmw.field = kw_electrostatic
         self.assertEqual("ei_selectrectangle(1.0,2.0,3.0,4.0,3)", fmw.select_rectangle(1.0, 2.0, 3.0, 4.0, 3))
+
+    def test_magnetic_problem(self):
+        self.assertEqual("mi_probdef(50,millimeters,axi,1e-08, 1, 30, 0)", FemmWriter().magnetic_problem(50, 'millimeters', 'axi'))

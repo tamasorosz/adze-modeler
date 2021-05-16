@@ -396,7 +396,7 @@ class FemmWriter:
          :param precision: 1e-8 (required)
          :param depth: depth of the analysis (not mandatory)
          :param minangle: sent to the mesh generator to define the minimum angle of the meshing triangles(not mandatory)
-         :param acsolver: the selected acsolver for the problem (not mandatory)
+         :param acsolver: the selected acsolver for the problem (not mandatory) - 0 successive approximation, 1 Newton solver
 
 
         The generated lua command has the following role:
@@ -417,7 +417,7 @@ class FemmWriter:
         if self.field != kw_magnetic:
             raise ValueError("Set the magnetic field parameter!")
 
-        cmd = Template("mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver")
+        cmd = Template("mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver)")
         return cmd.substitute(
             frequency=freq,
             units=unit,
@@ -425,21 +425,22 @@ class FemmWriter:
             precision=precision,
             depth=depth,
             minangle=minangle,
+            acsolver=acsolver,
         )
 
-    def run_analysis(self, flag=1):
-        """
-        Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
-        minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
-        If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
-        the main window is minimized, the solver runs minimized, too.
-
-        :param flag: 0 or 1, 1 is the default here (silent mode)
-        """
-        if self.field == kw_magnetic:
-            cmd = Template("mi_analyze($flag)")
-
-        return cmd.substitute(flag=flag)
+    # def run_analysis(self, flag=1):
+    #     """
+    #     Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
+    #     minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
+    #     If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
+    #     the main window is minimized, the solver runs minimized, too.
+    #
+    #     :param flag: 0 or 1, 1 is the default here (silent mode)
+    #     """
+    #     if self.field == kw_magnetic:
+    #         cmd = Template("mi_analyze($flag)")
+    #
+    #     return cmd.substitute(flag=flag)
 
 
 class FemmExecutor:
@@ -479,77 +480,3 @@ class FemmExecutor:
                     print(err)
                 # self.problem.logger.error(err)
                 # raise RuntimeError(err)
-
-
-# def eval(self, individual):
-#     super().eval(individual)
-#
-#     param_names_string = Executor._join_parameters_names(self.problem.parameters)
-#     param_values_string = Executor._join_parameters_values(individual.vector)
-#
-#     # cmd_string = self.femm_command + ' -lua-script={} -lua-var={} -lua-var={} -windowhide'.format(arg, 'radius=200',
-#     #                                                                                              'c=42')
-#     cmd_string = self.femm_command + f" -lua-script={arg}"
-#
-#     params = param_names_string.split(",")
-#     values = param_values_string.split(",")
-#     #
-#     for i in range(len(params)):
-#         temp = str(params[i]) + "=" + str(values[i])
-#         cmd_string += f" -lua-var={temp}"
-#
-#     try:
-#
-#         out = subprocess.run(cmd_string, shell=True, stdout=subprocess.PIPE)
-#
-#         if out.returncode != 0:
-#             err = "Unknown error"
-#             if out.stderr is not None:
-#                 err = f"Cannot run FEMM.\n\n {out.stderr}"
-#
-#             self.problem.logger.error(err)
-#             raise RuntimeError(err)
-#
-#         result = self.parse_results(self.output_files, individual)
-#         return result
-#
-#     except Exception as e:
-#         err = f"Cannot run FEMM with wine.\n\n {e}"
-#         self.problem.logger.error(err)
-#         raise RuntimeError(err)
-
-# eiprobdef(units,type,precision,(depth),(minangle))changes the problem defi-nition.
-# The units parameter specifies the units used for measuring length in the problemdomain.
-# Valid"units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
-# Setproblemtypeto"planar"for a 2-D planar problem,or to"axi"for an axisymmetric problem.
-# The precisionparameter dictates the precisionrequired by the solver. For example, entering 1.E-8 requires the
-# RMS of the residual to beless than 10−8. A fourth parameter, representing the depth of the problem in the
-# into-the-page direction for 2-D planar problems, can also be specifiedfor planar problems.
-# A sixthparameter represents the minimum angle constraint sent to the mesh generator.
-
-# hiprobdef(units,type,precision,(depth),(minangle),(prevsoln),(timestep))changes the problem definition.
-# Theunits parameter specifies the units used for measur-ing length in the problem domain.
-# Valid "units"entries are"inches","millimeters","centimeters","mils","meters, and"micrometers".
-# Setproblemtypeto"planar"for a 2-D planar problem, or to"axi"for an axisymmetric problem.
-# The precision parameter dictates the precision required by the solver. For example, entering 1.E-8 requires the
-# RMS of the residual to be less than 10−8. A fourth parameter, representing the depthof the problem in the
-# into-the-page direction for 2-D planarproblems, can also be specifiedfor planar problems.
-# A fifth parameter represents the minimum angle constraint sent to themesh generator. The sixth parameter
-# indicates the solutionfrom the previous time step to beused in time-transient problems. The seventh parameter
-# is the time step assumed for timetransient problems.
-
-# Gmsh ASCII output uses `%.16g` for floating point values,
-# meshio uses same precision but exponential notation `%.16e`.
-# def write(filename, mesh, fmt_version="4.1", binary=True, float_fmt=".16e"):
-#     """Writes a Gmsh msh file."""
-#     try:
-#         writer = _writers[fmt_version]
-#     except KeyError:
-#         try:
-#             writer = _writers[fmt_version]
-#         except KeyError:
-#             raise WriteError(
-#                 "Need mesh format in {} (got {})".format(
-#                     sorted(_writers.keys()), fmt_version
-#                 )
-#             )

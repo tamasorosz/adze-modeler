@@ -8,10 +8,10 @@ def import_dxf(dxf_file):
     try:
         doc = ezdxf.readfile(dxf_file)
     except OSError:
-        print(f"Not a DXF file or a generic I/O error.")
+        print("Not a DXF file or a generic I/O error.")
         sys.exit(1)
     except ezdxf.DXFStructureError:
-        print(f"Invalid or corrupted DXF file.")
+        print("Invalid or corrupted DXF file.")
         sys.exit(2)
 
     # iterate over all entities in modelspace

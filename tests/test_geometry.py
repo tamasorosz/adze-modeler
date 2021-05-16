@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from adze_modeler.geometry import Geometry
 from adze_modeler.gmsh import gmsh_writer
-from adze_modeler.objects import CircleArc
 from adze_modeler.objects import CubicBezier
 from adze_modeler.objects import Line
 from adze_modeler.objects import Node
@@ -39,7 +38,7 @@ class TestGeometry(TestCase):
         a = Node(1.0, 0.0)
         b = Node(0.5, 0.0)
 
-        l = Line(a, b, id=1, label="test")
+        #l = Line(a, b, id=1, label="test")
 
         c1 = Node(0.6, 0.1)
         c2 = Node(0.7, 0.2)
