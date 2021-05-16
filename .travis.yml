@@ -13,7 +13,7 @@ before_install:
     - sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
     - sudo apt update
     - sudo apt install wine-stable -f
-    - tar -Jxf femm42.tar.xz --directory ~/.wine/drive_c/
+    - tar -Jxf ~/adze-modeler/resources/femm42.tar.xz --directory ~/.wine/drive_c/
 
 
 install:
