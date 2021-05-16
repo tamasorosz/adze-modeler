@@ -12,15 +12,15 @@ before_install:
     - sudo gpg -o /etc/apt/trusted.gpg.d/winehq.key.gpg --dearmor winehq.key
     - sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
     - sudo apt update
-    - cd ..
-    - cd ..
-    - cd ..
-    - ls -a
-    - cd ..
-    - ls -a
-    - cd /home
-    - ls -a
     - sudo apt install wine-stable -f
+    - cd ..
+    - ls -a
+    - cd ..
+    - ls -a
+    - cd ..
+    - ls -a
+    - cd ..
+    - ls -a
     - cd resources
     - tar -Jxf femm42.tar.xz --directory ~/.wine/drive_c/
 
