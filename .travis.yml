@@ -15,7 +15,7 @@ before_install:
     - sudo apt install wine-stable -f
     - find ".wine"
     - cd resources
-    - tar -Jxf femm42.tar.xz --directory home/travis/.wine/drive_c/
+    - tar -Jxf femm42.tar.xz --directory $HOME/.wine/drive_c/
 
 
 install:
