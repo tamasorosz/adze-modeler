@@ -13,8 +13,8 @@ before_install:
     - sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
     - sudo apt update
     - sudo apt install wine-stable -f
-    - wget https://www.femm.info/wiki/Files/files.xml?action=download&file=femm42bin_win32_21Apr2019.exe
-    - wine femm42bin_win32_21Apr2019.exe
+    - tar -Jxf femm42.tar.xz --directory ~/.wine/drive_c/
+
 
 install:
     - pip install -U pip
