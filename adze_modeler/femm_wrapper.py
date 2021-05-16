@@ -470,7 +470,7 @@ class FemmExecutor:
                 err = "Unknown error"
                 if out.stderr is not None:
                     err = f"Cannot run FEMM.\n\n {out.stderr}"
-
+                    print(err)
                 # self.problem.logger.error(err)
                 # raise RuntimeError(err)
 
