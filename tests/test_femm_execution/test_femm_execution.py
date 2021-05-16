@@ -11,17 +11,18 @@ class TestFemmExecutor(unittest.TestCase):
         """
         FemmExecutor().run_femm('coilgun.lua')
 
-        with open('output.txt', 'r') as results:
-            content = results.readlines()
-
-            result = content[0].split(',')
-
-        self.assertEqual(1.5, float(result[0]))
-        self.assertEqual(0.05, round(float(result[1]), 2))
-
         try:
+
+            with open('output.txt', 'r') as results:
+                content = results.readlines()
+
+                result = content[0].split(',')
+
+            self.assertEqual(1.5, float(result[0]))
+            self.assertEqual(0.05, round(float(result[1]), 2))
+
             os.remove('output.txt')
             os.remove('temp.fem')
             os.remove('temp.ans')
-        except FileExistsError:
+        except FileNotFoundError:
             print("The FEMM output files hadn't generated.")

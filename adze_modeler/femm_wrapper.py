@@ -444,7 +444,7 @@ class FemmWriter:
 
 class FemmExecutor:
     # default value of the femm path under linux and under windows
-    femm_path_linux = "~/.wine/drive_c/femm42/bin/femm.exe"
+    femm_path_linux = "$HOME/.wine/drive_c/femm42/bin/femm.exe"
     femm_path_windows = r"C:\FEMM42\bin\femm.exe"
 
     def run_femm(self, script_file):
