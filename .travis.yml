@@ -14,9 +14,9 @@ before_install:
     - sudo apt update
     - sudo apt install wine-stable -f
     - ls
-    - cd $HOME
+    - cd resources
     - ls
-    - tar -Jxf resources/femm42.tar.xz --directory ~/.wine/drive_c/
+    - tar -Jxf /resources/femm42.tar.xz --directory ~/.wine/drive_c/
 
 
 install:
