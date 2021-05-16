@@ -14,11 +14,9 @@ before_install:
     - sudo apt update
     - sudo apt install --install-recommends winehq-stable
     - winecfg
-    - mkdir $HOME/.wine
-    - mkdir $HOME/.wine/drive_c
     - cd resources
     - tar -Jxf femm42.tar.xz --directory $HOME/.wine/drive_c/
-    
+
 
 install:
     - pip install -U pip
