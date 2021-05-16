@@ -13,6 +13,9 @@ before_install:
     - sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
     - sudo apt update
     - cd ..
+    - cd ..
+    - ls -a
+    - cd ..
     - ls -a
     - sudo apt install wine-stable -f
     - cd resources
