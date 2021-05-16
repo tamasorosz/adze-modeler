@@ -8,7 +8,7 @@ before_install:
     - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update -y
     - sudo apt-get install -y python-gmsh
-    - sudo apt-get install wine-stable
+    - sudo apt install wine32
     - wget https://www.femm.info/wiki/Files/files.xml?action=download&file=femm42bin_win32_21Apr2019.exe
     - wine femm42bin_win32_21Apr2019.exe
 
