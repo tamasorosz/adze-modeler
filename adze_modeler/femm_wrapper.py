@@ -6,9 +6,9 @@ The original FEMM code has separate scripting commands for the geometry generati
 
 """
 import os
+import subprocess
 from string import Template
 from sys import platform
-import subprocess
 
 # keywords
 kw_current_flow = "current_flow"
@@ -443,7 +443,13 @@ class FemmWriter:
 
 
 class FemmExecutor:
-    # default value of the femm path under linux and under windows
+    """
+    The goal of this class is to provide a simple and easily configurable FEMM executor.
+    This executor uses the Filelink option of FEMM, becuase the slowliness of this file based communication is not critical
+    in the case of larger computations, which can be parallelized by Artap, or other optimizatino frameworks.
+    """
+
+    # Default value of the femm path under linux and under windows.
     femm_path_linux = "$HOME/.wine/drive_c/femm42/bin/femm.exe"
     femm_path_windows = r"C:\FEMM42\bin\femm.exe"
 
@@ -453,7 +459,7 @@ class FemmExecutor:
         self.script_file = os.path.basename(script_file)
 
         # under linux we are using wine to run FEMM
-        if platform == 'linux':
+        if platform == "linux":
             self.femm_command = "wine " + self.femm_path_linux
 
             lua_path = os.path.abspath(self.script_file)
@@ -547,35 +553,3 @@ class FemmExecutor:
 #                     sorted(_writers.keys()), fmt_version
 #                 )
 #             )
-
-
-"""
--- Analysis parameters
-radius = 300 -- mm
-iterations = 1
-displacement_inc = 10/50 -- mm
-mydir = "./"
-open(mydir .. "AF_AntiPeriodic.fem")
-
-file_out = openfile(mydir .. "output.txt" , "w")
-
-for i = 0, iterations do
-    mi_analyze()
-    mi_loadsolution()
-    mo_groupselectblock(2)
-    fx = mo_blockintegral(18)
-    torque = fx*radius/1000*14
-    displ = i*displacement_inc
-    write(file_out, i, ",", displ, "," , torque, ",", radius, ",", a, ",", b, "\n")
-    if (i < iterations) then
-        mi_selectgroup(2)
-        mi_movetranslate(displacement_inc, 0)
-    end
-end
-
-closefile(file_out)
-
-mo_close()
-mi_close()
-quit()
-"""
