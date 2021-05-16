@@ -17,6 +17,7 @@ before_install:
     - mkdir $HOME/.wine/drive_c
     - cd resources
     - tar -Jxf femm42.tar.xz --directory $HOME/.wine/drive_c/
+    - wine
 
 
 install:
