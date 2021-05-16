@@ -12,13 +12,13 @@ before_install:
     - sudo gpg -o /etc/apt/trusted.gpg.d/winehq.key.gpg --dearmor winehq.key
     - sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
     - sudo apt update
-    - sudo apt install wine-stable winetricks
+    - sudo apt install --install-recommends winehq-stable
+    - winecfg
     - mkdir $HOME/.wine
     - mkdir $HOME/.wine/drive_c
     - cd resources
     - tar -Jxf femm42.tar.xz --directory $HOME/.wine/drive_c/
-    - sudo wine
-
+    
 
 install:
     - pip install -U pip
