@@ -14,8 +14,11 @@ before_install:
     - sudo apt update
     - cd ..
     - cd ..
+    - cd ..
     - ls -a
     - cd ..
+    - ls -a
+    - cd /home
     - ls -a
     - sudo apt install wine-stable -f
     - cd resources
