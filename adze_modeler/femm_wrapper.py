@@ -9,6 +9,7 @@ import os
 import subprocess
 from string import Template
 from sys import platform
+from collections import namedtuple
 
 # keywords
 kw_current_flow = "current_flow"
@@ -18,19 +19,66 @@ kw_heat_flow = "heat_flow"
 
 fields = [kw_electrostatic, kw_magnetic, kw_current_flow, kw_heat_flow]
 
+# material types for the different FEMM suppoerted magnetic fields
+
+# Lam_type
+# 0 – Not laminated or laminated in plane
+# 1 – laminated x or r
+# 2 – laminated y or z
+# 3 – Magnet wire
+# 4 – Plain stranded wire
+# 5 – Litz wire
+# 6 – Square wire
+
+MagneticMaterial = namedtuple('magnetic', ["material_name",
+                                           'mu_x',  # Relative permeability in the x- or r-direction.
+                                           'mu_y',  # Relative permeability in the y- or z-direction.
+                                           'H_c',  # Permanent magnet coercivity in Amps/Meter.
+                                           "J",  # Real Applied source current density in Amps/mm2 .
+                                           "Cduct",  # Electrical conductivity of the material in MS/m.
+                                           "Lam_d",  # Hysteresis lag angle in degrees, used for nonlinear BH curves.
+                                           "Phi_hmax",
+                                           "lam_fill",
+                                           # Fraction of the volume occupied per lamination that is actually filled with iron (Note that this parameter defaults to 1 the femme preprocessor dialog box because, by default, iron completely fills the volume)
+                                           "LamType",
+                                           "Phi_hx",
+                                           # Hysteresis lag in degrees in the x-direction for linear problems.
+                                           "Phi_hy",
+                                           # Hysteresis lag in degrees in the y-direction for linear problems.
+                                           "NStrands",
+                                           # Number of strands in the wire build. Should be 1 for Magnet or Square wire.
+                                           "WireD"])  # Diameter of each wire constituent strand in millimeters.
+
 
 class FemmWriter:
+    """ Writes out a model snapshot"""
     field = kw_magnetic
+    lua_model = []  # list of the lua commands
 
-    def write(self, model, file_name):
+    def write(self, file_name):
         """Generate a runnable lua-script for a FEMM calculation.
 
-        :param model: represents a geometry in the adze-modeler
         :param file_name: the code (re)writes the snapshot from the created geometry to the given code
         """
 
         with open(file_name, "w") as writer:
-            ...
+            for line in self.lua_model:
+                writer.write(line + "\n")
+
+    def init_problem(self, out_file="femm_data.csv"):
+        """
+        This commands initialize a femm console and flush the variables
+        :param out_file: defines the default output file
+        """
+
+        cmd_list = []
+        cmd_list.append("showconsole()")  # does nothing if the console is already displayed
+        cmd_list.append("clearconsole()")  # clears both the input and output windows for a fresh start.
+        cmd_list.append("remove(\"{}\")".format(out_file))  # get rid of the old data file, if it exists
+        cmd_list.append("newdocument(0)")  # the 0 specifies a magnetics problem
+        # cmd_list.append("mi_hidegrid()")
+
+        return cmd_list
 
     # object add remove commnads from FEMM MANUAL page 84.
     def add_node(self, x, y):
@@ -55,7 +103,7 @@ class FemmWriter:
         return cmd.substitute(x_coord=x, y_coord=y)
 
     def add_segment(self, x1, y1, x2, y2):
-        """Add a new line segment from node closest to (x1,y1) tonode closest to (x2,y2)"""
+        """Add a new line segment from node closest to (x1,y1) to node closest to (x2,y2)"""
 
         cmd = None
         if self.field not in fields:
@@ -100,6 +148,7 @@ class FemmWriter:
         """
         Add a new arc segment from the nearest nodeto (x1,y1) to the nearest node to (x2,y2)
         with angle ‘angle’ divided into ‘maxseg’ segments.
+        with angle ‘angle’ divided into ‘maxseg’ segments.
         """
 
         cmd = None
@@ -141,306 +190,353 @@ class FemmWriter:
 
         return cmd
 
-    def delete_selected_nodes(self):
-        """Delete all selected nodes, the object should be selected the node selection command."""
+    def add_material(self, material):
+        """
+        mi addmaterial("materialname", mu_x, mu_y, H_c, J, Cduct, Lam_d, Phi_hmax,
+                        lam_fill, LamType, Phi_hx, Phi_hy, NStrands, WireD)
+        """
 
         cmd = None
         if self.field not in fields:
             raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_magnetic:
-            cmd = "mi_deleteselectednodes"
+        if self.field == kw_magnetic and isinstance(material, MagneticMaterial):
+            cmd = Template("mi_addmaterial($materialname, $mux, $muy, $Hc, $J, $Cduct, $Lamd, $Phi_hmax, $lamfill, "
+                           "$LamType, $Phi_hx, $Phi_hy, $NStrands, $WireD)")
 
-        if self.field == kw_electrostatic:
-            cmd = "ei_deleteselectednodes"
-
-        if self.field == kw_heat_flow:
-            cmd = "hi_deleteselectednodes"
-
-        if self.field == kw_current_flow:
-            cmd = "ci_deleteselectednodes"
+            # cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
+            # hy is missing from the FEMM command
+            cmd = cmd.substitute(materialname=material.material_name, mux=material.mu_x, muy=material.mu_y,
+                                 Hc=material.H_c,
+                                 J=material.J, Cduct=material.Cduct, Lamd=material.Lam_d, Phi_hmax=material.Phi_hmax,
+                                 lamfill=material.lam_fill, LamType=material.LamType,
+                                 Phi_hx=material.Phi_hx, Phi_hy=material.Phi_hy,
+                                 NStrands=material.NStrands, WireD=material.WireD)
+        #
+        # if self.field == kw_electrostatic:
+        #     pass
+        #
+        # if self.field == kw_heat_flow:
+        #     pass
+        #
+        # if self.field == kw_current_flow:
+        #     pass
 
         return cmd
 
-    def delete_selected_labels(self):
-        """Delete all selected labels"""
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+def delete_selected_nodes(self):
+    """Delete all selected nodes, the object should be selected the node selection command."""
 
-        if self.field == kw_magnetic:
-            cmd = "mi_deleteselectedlabels"
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_electrostatic:
-            cmd = "ei_deleteselectedlabels"
+    if self.field == kw_magnetic:
+        cmd = "mi_deleteselectednodes"
 
-        if self.field == kw_heat_flow:
-            cmd = "hi_deleteselectedlabels"
+    if self.field == kw_electrostatic:
+        cmd = "ei_deleteselectednodes"
 
-        if self.field == kw_current_flow:
-            cmd = "ci_deleteselectedlabels"
+    if self.field == kw_heat_flow:
+        cmd = "hi_deleteselectednodes"
 
-        return cmd
+    if self.field == kw_current_flow:
+        cmd = "ci_deleteselectednodes"
 
-    def delete_selected_segments(self):
-        """Delete all selected segments."""
+    return cmd
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_magnetic:
-            cmd = "mi_deleteselectedsegments"
+def delete_selected_labels(self):
+    """Delete all selected labels"""
 
-        if self.field == kw_electrostatic:
-            cmd = "ei_deleteselectedsegments"
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_heat_flow:
-            cmd = "hi_deleteselectedsegments"
+    if self.field == kw_magnetic:
+        cmd = "mi_deleteselectedlabels"
 
-        if self.field == kw_current_flow:
-            cmd = "ci_deleteselectedsegments"
+    if self.field == kw_electrostatic:
+        cmd = "ei_deleteselectedlabels"
 
-        return cmd
+    if self.field == kw_heat_flow:
+        cmd = "hi_deleteselectedlabels"
 
-    def delete_delete_selected_arc_segments(self):
-        """Delete all selected arc segments."""
+    if self.field == kw_current_flow:
+        cmd = "ci_deleteselectedlabels"
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    return cmd
 
-        if self.field == kw_magnetic:
-            cmd = "mi_deleteselectedarcsegments"
 
-        if self.field == kw_electrostatic:
-            cmd = "ei_deleteselectedarcsegments"
+def delete_selected_segments(self):
+    """Delete all selected segments."""
 
-        if self.field == kw_heat_flow:
-            cmd = "hi_deleteselectedarcsegments"
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_current_flow:
-            cmd = "ci_deleteselectedarcsegments"
+    if self.field == kw_magnetic:
+        cmd = "mi_deleteselectedsegments"
 
-        return cmd
+    if self.field == kw_electrostatic:
+        cmd = "ei_deleteselectedsegments"
 
-    # object selection commnads from FEMM MANUAL page 84.
-    def clear_selected(self):
-        """Clear all selected nodes, blocks, segments and arc segments."""
+    if self.field == kw_heat_flow:
+        cmd = "hi_deleteselectedsegments"
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_current_flow:
+        cmd = "ci_deleteselectedsegments"
 
-        if self.field == kw_magnetic:
-            cmd = "mi_clearselected()"
+    return cmd
 
-        if self.field == kw_electrostatic:
-            cmd = "ei_clearselected()"
 
-        if self.field == kw_heat_flow:
-            cmd = "hi_clearselected()"
+def delete_delete_selected_arc_segments(self):
+    """Delete all selected arc segments."""
 
-        if self.field == kw_current_flow:
-            cmd = "ci_clearselected()"
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        return cmd
+    if self.field == kw_magnetic:
+        cmd = "mi_deleteselectedarcsegments"
 
-    def select_segment(self, x, y):
-        """Select the line segment closest to (x,y)"""
+    if self.field == kw_electrostatic:
+        cmd = "ei_deleteselectedarcsegments"
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_heat_flow:
+        cmd = "hi_deleteselectedarcsegments"
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectsegment($xp, $yp)")
+    if self.field == kw_current_flow:
+        cmd = "ci_deleteselectedarcsegments"
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectsegment($xp, $yp)")
+    return cmd
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectsegment($xp, $yp)")
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectsegment($xp, $yp)")
+def add_circprop(self, circuitname, i, circuittype):
+    """
+    Adds a new circuit property with name "circuitname" with a prescribed current, i.
+    The circuittype parameter is
 
-        return cmd.substitute(xp=x, yp=y)
+    Only in the case of magnetic fields.
 
-    def select_node(self, x, y):
-        """Select node closest to (x,y), Returns the coordinates ofthe se-lected node"""
+    :param circuitname: name of the magnetic circuit
+    :param i : prescribed current in Amper
+    :param circuittype:  0for a parallel - connected circuit and 1 for a series-connected circuit.
+    """
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    return "mi_addcircprop(\"{}\",{},{})".format(circuitname, i, circuittype)
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectnode($xp, $yp)")
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectnode($xp, $yp)")
+# object selection commnads from FEMM MANUAL page 84.
+def clear_selected(self):
+    """Clear all selected nodes, blocks, segments and arc segments."""
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectnode($xp, $yp)")
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectnode($xp, $yp)")
+    if self.field == kw_magnetic:
+        cmd = "mi_clearselected()"
 
-        return cmd.substitute(xp=x, yp=y)
+    if self.field == kw_electrostatic:
+        cmd = "ei_clearselected()"
 
-    def select_label(self, x, y):
-        """Select the label closet to (x,y). Returns the coordinates of the selected label."""
+    if self.field == kw_heat_flow:
+        cmd = "hi_clearselected()"
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_current_flow:
+        cmd = "ci_clearselected()"
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectlabel($xp, $yp)")
+    return cmd
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectlabel($xp, $yp)")
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectlabel($xp, $yp)")
+def select_segment(self, x, y):
+    """Select the line segment closest to (x,y)"""
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectlabel($xp, $yp)")
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        return cmd.substitute(xp=x, yp=y)
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectsegment($xp, $yp)")
 
-    def select_group(self, n):
-        """
-        Select the n th group of nodes, segments, arc segments and block labels.
-        This function will clear all previously selected elements and leave the edit mode in 4(group)
-        """
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectsegment($xp, $yp)")
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectsegment($xp, $yp)")
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectgroup($np)")
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectsegment($xp, $yp)")
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectgroup($np)")
+    return cmd.substitute(xp=x, yp=y)
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectgroup($np)")
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectgroup($np)")
+def select_node(self, x, y):
+    """Select node closest to (x,y), Returns the coordinates ofthe se-lected node"""
 
-        return cmd.substitute(np=n)
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-    def select_circle(self, x, y, R, editmode):
-        """
-        Select circle selects objects within a circle of radius R centered at(x, y).If only x, y, and R paramters
-        are given, the current edit mode is used.If the editmode parameter is used, 0 denotes nodes, 2 denotes block
-        labels, 2 denotes segments, 3 denotes arcs, and 4 specifies that all entity types are to be selected.
-        """
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectnode($xp, $yp)")
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectnode($xp, $yp)")
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectcircle($xp, $yp, $Rp, $Editmode)")
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectnode($xp, $yp)")
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectcircle($xp, $yp, $Rp, $Editmode)")
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectnode($xp, $yp)")
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectcircle($xp, $yp, $Rp, $Editmode)")
+    return cmd.substitute(xp=x, yp=y)
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectcircle($xp, $yp, $Rp, $Editmode)")
 
-        return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
+def select_label(self, x, y):
+    """Select the label closet to (x,y). Returns the coordinates of the selected label."""
 
-    def select_rectangle(self, x1, y1, x2, y2, editmode):
-        """
-        This command selects objects within a rectangle definedby points (x1,y1) and (x2,y2).
-        If no editmode parameter is supplied, the current edit mode isused. If the editmode parameter is used,
-        0 denotes nodes, 2 denotes block labels, 2 denotessegments, 3 denotes arcs, and 4 specifies that all
-        entity types are to be selected.
-        """
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
-        cmd = None
-        if self.field not in fields:
-            raise ValueError("The physical field is not defined!")
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectlabel($xp, $yp)")
 
-        if self.field == kw_magnetic:
-            cmd = Template("mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectlabel($xp, $yp)")
 
-        if self.field == kw_electrostatic:
-            cmd = Template("ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectlabel($xp, $yp)")
 
-        if self.field == kw_heat_flow:
-            cmd = Template("hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectlabel($xp, $yp)")
 
-        if self.field == kw_current_flow:
-            cmd = Template("ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+    return cmd.substitute(xp=x, yp=y)
 
-        return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
-    # problem commands for the magnetic problem
-    def magnetic_problem(self, freq, unit, type, precision=1e-8, depth=1, minangle=30, acsolver=0):
-        """
-         Definition of the magnetic problem, like probdef(0,'inches','axi',1e-8,0,30);
+def select_group(self, n):
+    """
+    Select the n th group of nodes, segments, arc segments and block labels.
+    This function will clear all previously selected elements and leave the edit mode in 4(group)
+    """
 
-         :param freq: Frequency in Hertz (required)
-         :param unit: "inches","millimeters","centimeters","mils","meters, and"micrometers" (required)
-         :param type: "planar", "axi" (required)
-         :param precision: 1e-8 (required)
-         :param depth: depth of the analysis (not mandatory)
-         :param minangle: sent to the mesh generator to define the minimum angle of the meshing triangles(not mandatory)
-         :param acsolver: the selected acsolver for the problem (not mandatory) - 0 successive approximation, 1 Newton solver
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
 
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectgroup($np)")
 
-        The generated lua command has the following role:
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectgroup($np)")
 
-         miprobdef(frequency,units,type,precision,(depth),(minangle),(acsolver) changes the problem definition.
-         Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
-         length in the problem domain. Valid"units"en-tries are"inches","millimeters","centimeters","mils","meters,
-         and"micrometers".Set the parameter problem type to"planar"for a 2-D planar problem, or to"axi"for
-         anaxisymmetric problem. The precision parameter dictates the precision required by the solver.
-         For example, entering 1E-8 requires the RMS of the residual to be less than 10−8.A fifth parameter,
-         representing the depth of sthe problem in the into-the-page direction for2-D planar problems, can also also be
-         specified. A sixth parameter represents the minimumangle constraint sent to the mesh generator, 30 degress is
-         the usual choice. The acsolver parameter specifies which solver is to be used for AC problems:
-         0 for successive approximation, 1 for Newton. A seventh parameter specifies the solver type tobe used
-         for AC problems.
-        """
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectgroup($np)")
 
-        if self.field != kw_magnetic:
-            raise ValueError("Set the magnetic field parameter!")
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectgroup($np)")
 
-        cmd = Template("mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver)")
-        return cmd.substitute(
-            frequency=freq,
-            units=unit,
-            type=type,
-            precision=precision,
-            depth=depth,
-            minangle=minangle,
-            acsolver=acsolver,
-        )
+    return cmd.substitute(np=n)
 
-    # def run_analysis(self, flag=1):
-    #     """
-    #     Runs  the appropriate  solver.  The  flag  parameter  controls  whether  the  solver window  is  visible  or
-    #     minimized.  For  a  visible  window,  specify  0.  For  a  minimized  window,  flag should be set to 1.
-    #     If no value is specified for flag, the visibility of the solver is inherited from the main window, i.e. if
-    #     the main window is minimized, the solver runs minimized, too.
-    #
-    #     :param flag: 0 or 1, 1 is the default here (silent mode)
-    #     """
-    #     if self.field == kw_magnetic:
-    #         cmd = Template("mi_analyze($flag)")
-    #
-    #     return cmd.substitute(flag=flag)
+
+def select_circle(self, x, y, R, editmode):
+    """
+    Select circle selects objects within a circle of radius R centered at(x, y).If only x, y, and R paramters
+    are given, the current edit mode is used.If the editmode parameter is used, 0 denotes nodes, 2 denotes block
+    labels, 2 denotes segments, 3 denotes arcs, and 4 specifies that all entity types are to be selected.
+    """
+
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
+
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectcircle($xp, $yp, $Rp, $Editmode)")
+
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectcircle($xp, $yp, $Rp, $Editmode)")
+
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectcircle($xp, $yp, $Rp, $Editmode)")
+
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectcircle($xp, $yp, $Rp, $Editmode)")
+
+    return cmd.substitute(xp=x, yp=y, Rp=R, Editmode=editmode)
+
+
+def select_rectangle(self, x1, y1, x2, y2, editmode):
+    """
+    This command selects objects within a rectangle definedby points (x1,y1) and (x2,y2).
+    If no editmode parameter is supplied, the current edit mode isused. If the editmode parameter is used,
+    0 denotes nodes, 2 denotes block labels, 2 denotessegments, 3 denotes arcs, and 4 specifies that all
+    entity types are to be selected.
+    """
+
+    cmd = None
+    if self.field not in fields:
+        raise ValueError("The physical field is not defined!")
+
+    if self.field == kw_magnetic:
+        cmd = Template("mi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+
+    if self.field == kw_electrostatic:
+        cmd = Template("ei_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+
+    if self.field == kw_heat_flow:
+        cmd = Template("hi_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+
+    if self.field == kw_current_flow:
+        cmd = Template("ci_selectrectangle($x1p,$y1p,$x2p,$y2p,$Editmode)")
+
+    return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
+
+
+# problem commands for the magnetic problem
+def magnetic_problem(self, freq, unit, type, precision=1e-8, depth=1, minangle=30, acsolver=0):
+    """
+     Definition of the magnetic problem, like probdef(0,'inches','axi',1e-8,0,30);
+
+     :param freq: Frequency in Hertz (required)
+     :param unit: "inches","millimeters","centimeters","mils","meters, and"micrometers" (required)
+     :param type: "planar", "axi" (required)
+     :param precision: 1e-8 (required)
+     :param depth: depth of the analysis (not mandatory)
+     :param minangle: sent to the mesh generator to define the minimum angle of the meshing triangles(not mandatory)
+     :param acsolver: the selected acsolver for the problem (not mandatory) - 0 successive approximation, 1 Newton solver
+
+
+    The generated lua command has the following role:
+
+     miprobdef(frequency,units,type,precision,(depth),(minangle),(acsolver) changes the problem definition.
+     Set frequency to the desired frequency in Hertz. The units parameter specifies the units used for measuring
+     length in the problem domain. Valid"units"en-tries are"inches","millimeters","centimeters","mils","meters,
+     and"micrometers".Set the parameter problem type to"planar"for a 2-D planar problem, or to"axi"for
+     anaxisymmetric problem. The precision parameter dictates the precision required by the solver.
+     For example, entering 1E-8 requires the RMS of the residual to be less than 10−8.A fifth parameter,
+     representing the depth of sthe problem in the into-the-page direction for2-D planar problems, can also also be
+     specified. A sixth parameter represents the minimumangle constraint sent to the mesh generator, 30 degress is
+     the usual choice. The acsolver parameter specifies which solver is to be used for AC problems:
+     0 for successive approximation, 1 for Newton. A seventh parameter specifies the solver type tobe used
+     for AC problems.
+    """
+
+    if self.field != kw_magnetic:
+        raise ValueError("Set the magnetic field parameter!")
+
+    cmd = Template("mi_probdef($frequency,$units,$type,$precision, $depth, $minangle, $acsolver)")
+    return cmd.substitute(
+        frequency=freq,
+        units=r"'" + unit + r"'",
+        type=r"'" + type + r"'",
+        precision=precision,
+        depth=depth,
+        minangle=minangle,
+        acsolver=acsolver,
+    )
 
 
 class FemmExecutor:

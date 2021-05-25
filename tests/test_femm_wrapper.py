@@ -4,6 +4,7 @@ from adze_modeler.femm_wrapper import FemmWriter
 from adze_modeler.femm_wrapper import kw_current_flow
 from adze_modeler.femm_wrapper import kw_electrostatic
 from adze_modeler.femm_wrapper import kw_heat_flow
+from adze_modeler.femm_wrapper import MagneticMaterial
 
 
 class FemmTester(TestCase):
@@ -264,4 +265,18 @@ class FemmTester(TestCase):
         self.assertEqual("ei_selectrectangle(1.0,2.0,3.0,4.0,3)", fmw.select_rectangle(1.0, 2.0, 3.0, 4.0, 3))
 
     def test_magnetic_problem(self):
-        self.assertEqual("mi_probdef(50,millimeters,axi,1e-08, 1, 30, 0)", FemmWriter().magnetic_problem(50, 'millimeters', 'axi'))
+        self.assertEqual(r"mi_probdef(50,'millimeters','axi',1e-08, 1, 30, 0)",
+                         FemmWriter().magnetic_problem(50, 'millimeters', 'axi'))
+
+    def test_init_proble(self):
+        self.assertIn("showconsole", FemmWriter().init_problem()[0])
+        self.assertIn("clear", FemmWriter().init_problem()[1])
+
+    def test_add_circ_prop(self):
+        self.assertEqual("mi_addcircprop(\"test\",1,0)", FemmWriter().add_circprop("test", 1, 0))
+
+    def test_add_material(self):
+
+        coil = MagneticMaterial('coil',1,1,0,0,0,0,0,1,0,0,0,0,0)
+
+        self.assertEqual("mi_addmaterial(coil, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)" , FemmWriter().add_material(coil))
