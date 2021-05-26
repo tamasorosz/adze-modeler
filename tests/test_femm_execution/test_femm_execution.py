@@ -1,7 +1,9 @@
 import os
 import unittest
 
-from adze_modeler.femm_wrapper import FemmExecutor, FemmWriter
+from adze_modeler.femm_wrapper import FemmExecutor
+from adze_modeler.femm_wrapper import FemmWriter
+from adze_modeler.femm_wrapper import MagneticMaterial
 
 
 class TestFemmExecutor(unittest.TestCase):
@@ -29,12 +31,11 @@ class TestFemmExecutor(unittest.TestCase):
 
 
 class TestFemmWriterWithExecutor(unittest.TestCase):
-    """Tries to run a simple FEMM model, which is made with the FemmWriter class """
+    """Tries to run a simple FEMM model, which is made with the FemmWriter class"""
 
     def test_air_core_coil_inductance(self):
         """
-        mi_addmaterial('coil', 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0);
-        mi_addmaterial('air', 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0);
+
         mi_addboundprop('abc', 0, 0, 0, 0, 0, 0, 1 / (r * 0.0254 * pi * 4.e-7), 0, 2);
         mi_selectlabel((ri + ro) / 2, 0);
         mi_setblockprop('coil', 0, r / 20, 'icoil', 0, 0, n);
@@ -58,15 +59,15 @@ class TestFemmWriterWithExecutor(unittest.TestCase):
         writer.lua_model.extend(writer.init_problem())
 
         # problem definition
-        writer.lua_model.append(writer.magnetic_problem(0, 'inches', 'axi'))
+        writer.lua_model.append(writer.magnetic_problem(0, "inches", "axi"))
 
         # model geometry
         # rectangle (coil) -- ri, -z / 2, ro, z / 2 --
         n = 100
-        ri = 1.
-        ro = 2.
-        z = 1.
-        r = 2. * max(ri, ro, z)
+        ri = 1.0
+        ro = 2.0
+        z = 1.0
+        r = 2.0 * max(ri, ro, z)
 
         # nodes
         z = 0.5 * z
@@ -88,11 +89,18 @@ class TestFemmWriterWithExecutor(unittest.TestCase):
         writer.lua_model.append(writer.add_arc(0.0, -r, 0.0, r, 180, 5))
 
         # circle properties and material definitions
-        writer.lua_model.append(writer.add_circprop('icoil', 1, 1))
+        writer.lua_model.append(writer.add_circprop("icoil", 1, 1))
 
         writer.lua_model.append(writer.add_blocklabel((ri + ro) / 2, 0))
         writer.lua_model.append(writer.add_blocklabel(0.75 * r, 0))
 
+        # add material properties
+        coil = MagneticMaterial("coil", 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+        air = MagneticMaterial("air", 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+
+        writer.lua_model.append(writer.add_material(coil))
+        writer.lua_model.append(writer.add_material(air))
+
         print(writer.lua_model)
-        writer.write('test.lua')
+        writer.write("test.lua")
         FemmExecutor().run_femm("test.lua")
