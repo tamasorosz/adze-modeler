@@ -1,9 +1,11 @@
 import os
 import unittest
+from math import pi
 
 from adze_modeler.femm_wrapper import FemmExecutor
 from adze_modeler.femm_wrapper import FemmWriter
 from adze_modeler.femm_wrapper import MagneticMaterial
+from adze_modeler.femm_wrapper import MagneticMixed
 
 
 class TestFemmExecutor(unittest.TestCase):
@@ -35,18 +37,6 @@ class TestFemmWriterWithExecutor(unittest.TestCase):
 
     def test_air_core_coil_inductance(self):
         """
-
-        mi_addboundprop('abc', 0, 0, 0, 0, 0, 0, 1 / (r * 0.0254 * pi * 4.e-7), 0, 2);
-        mi_selectlabel((ri + ro) / 2, 0);
-        mi_setblockprop('coil', 0, r / 20, 'icoil', 0, 0, n);
-        mi_clearselected;
-        mi_selectlabel(0.75 * r, 0);
-        mi_setblockprop('air', 0, r / 100, '<None>', 0, 0, 0);
-        mi_clearselected;
-        mi_selectarcsegment(r, 0);
-        mi_setarcsegmentprop(5, 'abc', 0, 0);
-        mi_saveas('c:\\femm42\\examples\\tmp.fem');
-        mi_analyze;
         mi_loadsolution;
         c = mo_getcircuitproperties('icoil');
         y = c(3);
@@ -101,6 +91,31 @@ class TestFemmWriterWithExecutor(unittest.TestCase):
         writer.lua_model.append(writer.add_material(coil))
         writer.lua_model.append(writer.add_material(air))
 
-        print(writer.lua_model)
+        # add boundary properties
+        mixed_boundary = MagneticMixed("abc", 1.0 / (r * 0.0254 * pi * 4e-7), 0)
+        writer.lua_model.append(FemmWriter().add_boundary(mixed_boundary))
+
+        # set coil property
+        writer.lua_model.append(writer.select_label((ri + ro) / 2, 0))
+        writer.lua_model.append(writer.set_blockprop("coil", r / 20, "icoil", 0, 0, n))
+        writer.lua_model.append(writer.clear_selected())
+
+        # set air
+        writer.lua_model.append(writer.select_label(0.75 * r, 0))
+        writer.lua_model.append(writer.set_blockprop("air", r / 100, "<None>", 0, 0, 0))
+        writer.lua_model.append(writer.clear_selected())
+
+        # set boundaries
+        writer.lua_model.append(writer.select_arc_segment(r, 0))
+        writer.lua_model.append(writer.set_arc_segment_prop(5, "abc", 0, 0))
+
+        # the model have to be saved into a femm format to be used from the FEMM-wrapper script
+        writer.lua_model.append(writer.save_as("test.fem"))
+        writer.lua_model.append(writer.analyze())
+        writer.lua_model.append(writer.load_solution())
+        result = writer.lua_model.append(writer.get_circuit_properties("icoil"))
+
+        # print(writer.lua_model)
+
         writer.write("test.lua")
         FemmExecutor().run_femm("test.lua")

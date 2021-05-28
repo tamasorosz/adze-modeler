@@ -54,6 +54,10 @@ MagneticMaterial = namedtuple(
     ],
 )  # Diameter of each wire constituent strand in millimeters.
 
+# TODO: other types should be defined
+MagneticDirichlet = namedtuple("magnetic_dirichlet", ["name", "a_0", "a_1", "a_2", "phi"])
+MagneticMixed = namedtuple("magnetic_mixed", ["name", "c0", "c1"])
+
 
 class FemmWriter:
     """Writes out a model snapshot"""
@@ -85,6 +89,23 @@ class FemmWriter:
         # cmd_list.append("mi_hidegrid()")
 
         return cmd_list
+
+    def analyze(self, flag=1):
+        """
+
+        Runs a FEMM analysis to solve a problem. By default the analysis runs in non-visible mode.
+
+        The flag parameter controls whether the fkern window is visible or minimized. For a visible window,
+        either specify no value for flag or specify 0. For a minimized window, flag should be set to 1.
+        """
+        cmd = None
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template("mi_analyze($flag)")
+
+        return cmd.substitute(flag=flag)
 
     # object add remove commnads from FEMM MANUAL page 84.
     def add_node(self, x, y):
@@ -196,6 +217,54 @@ class FemmWriter:
 
         return cmd
 
+    def add_boundary(self, boundary):
+        """
+        :param boundary: checks the type of the boundary parameter, then
+        """
+        cmd = None
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic and isinstance(boundary, MagneticDirichlet):
+            cmd = Template(
+                "mi_addboundprop($propname, $A0, $A1, $A2, $Phi, $Mu, $Sig, " "$c0, $c1, $BdryFormat, $ia, $oa)"
+            )
+            cmd = cmd.substitute(
+                propname="'" + boundary.name + "'",
+                A0=boundary.a_0,
+                A1=boundary.a_1,
+                A2=boundary.a_2,
+                Phi=boundary.phi,
+                Mu=0,
+                Sig=0,
+                c0=0,
+                c1=0,
+                BdryFormat=0,
+                ia=0,
+                oa=0,
+            )
+
+        if self.field == kw_magnetic and isinstance(boundary, MagneticMixed):
+            cmd = Template(
+                "mi_addboundprop($propname, $A0, $A1, $A2, $Phi, $Mu, $Sig, " "$c0, $c1, $BdryFormat, $ia, $oa)"
+            )
+            cmd = cmd.substitute(
+                propname="'" + boundary.name + "'",
+                A0=0,
+                A1=0,
+                A2=0,
+                Phi=0,
+                Mu=0,
+                Sig=0,
+                c0=boundary.c0,
+                c1=boundary.c1,
+                BdryFormat=2,
+                ia=0,
+                oa=0,
+            )
+
+        return cmd
+
     def add_material(self, material):
         """
         mi addmaterial("materialname", mu_x, mu_y, H_c, J, Cduct, Lam_d, Phi_hmax,
@@ -215,7 +284,7 @@ class FemmWriter:
             # cmd.substitute(x_1=x1, y_1=y1, x_2=x2, y_2=y2, angle=angle, maxseg=maxseg)
             # hy is missing from the FEMM command
             cmd = cmd.substitute(
-                materialname=material.material_name,
+                materialname="'" + material.material_name + "'",
                 mux=material.mu_x,
                 muy=material.mu_y,
                 Hc=material.H_c,
@@ -305,7 +374,7 @@ class FemmWriter:
 
         return cmd
 
-    def delete_delete_selected_arc_segments(self):
+    def delete_selected_arc_segments(self):
         """Delete all selected arc segments."""
 
         cmd = None
@@ -380,6 +449,27 @@ class FemmWriter:
 
         if self.field == kw_current_flow:
             cmd = Template("ci_selectsegment($xp, $yp)")
+
+        return cmd.substitute(xp=x, yp=y)
+
+    def select_arc_segment(self, x, y):
+        """Select the arc segment closest to (x,y)"""
+
+        cmd = None
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template("mi_selectarcsegment($xp, $yp)")
+
+        # if self.field == kw_electrostatic:
+        #     cmd = Template("ei_selectnode($xp, $yp)")
+        #
+        # if self.field == kw_heat_flow:
+        #     cmd = Template("hi_selectnode($xp, $yp)")
+        #
+        # if self.field == kw_current_flow:
+        #     cmd = Template("ci_selectnode($xp, $yp)")
 
         return cmd.substitute(xp=x, yp=y)
 
@@ -500,6 +590,73 @@ class FemmWriter:
 
         return cmd.substitute(x1p=x1, y1p=y1, x2p=x2, y2p=y2, Editmode=editmode)
 
+    def set_arc_segment_prop(self, maxsegdeg, propname, hide, group):
+        """
+        :param maxsegdeg: Meshed with elements that span at most maxsegdeg degrees per element
+        :param propname: boundary property
+        :param hide: 0 = not hidden in post-processor, 1 == hidden in post processor
+        :param group: a member of group number group
+        """
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template("mi_setarcsegmentprop($maxsegdeg, $propname, $hide, $group)")
+            cmd = cmd.substitute(maxsegdeg=maxsegdeg, propname="'" + propname + "'", hide=hide, group=group)
+        return cmd
+
+    def set_blockprop(self, blockname=None, meshsize=None, circuit_name=None, magdirection=0, group="group", turns=0):
+        """
+        :param meshsize: default value is None -> invokes automesh
+            this command will use automesh option as the default, if the mesh size is not defined
+
+        # these parameters used only in the case of magnetic field
+
+        :param magdirection:
+
+            The magnetization is directed along an angle in measured in degrees denoted by the
+            parameter magdirection. Alternatively, magdirection can be a string containing a
+            formula that prescribes the magnetization direction as a function of element position.
+            In this formula theta and R denotes the angle in degrees of a line connecting the center
+            each element with the origin and the length of this line, respectively; x and y denote
+            the x- and y-position of the center of the each element. For axisymmetric problems, r
+            and z should be used in place of x and y.
+
+        :param group: None, mebmer of the named group
+
+        """
+        cmd = None
+
+        if not meshsize:
+            automesh = 1
+            meshsize = 0
+
+        else:
+            automesh = 0
+
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template(
+                "mi_setblockprop($blockname, $automesh, $meshsize, $incircuit, $magdirection, $group, $turns)"
+            )
+            cmd = cmd.substitute(
+                blockname="'" + blockname + "'",
+                automesh=automesh,
+                meshsize=meshsize,
+                incircuit="'" + circuit_name + "'",
+                magdirection=magdirection,
+                group=group,
+                turns=turns,
+            )
+
+        # ei_setblockprop("blockname", automesh, meshsize, group)
+        # ci_setblockprop("blockname", automesh, meshsize, group)
+        # hi_setblockprop("blockname", automesh, meshsize, group)
+
+        return cmd
+
     # problem commands for the magnetic problem
     def magnetic_problem(self, freq, unit, type, precision=1e-8, depth=1, minangle=30, acsolver=0):
         """
@@ -542,6 +699,46 @@ class FemmWriter:
             minangle=minangle,
             acsolver=acsolver,
         )
+
+    def save_as(self, file_name):
+        """
+        To solve the problem with FEMM, you have to save it with the save_as command.
+
+        mi_saveas("filename") saves the file with name "filename". Note if you use a path you
+                              must use two backslashes e.g. "c:\\temp\\myfemmfile.fem
+        """
+
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template("mi_saveas($filename)")
+
+        return cmd.substitute(filename='"' + file_name + '"')
+
+    def load_solution(self):
+        """Loads  and displays the solution."""
+
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = "mi_loadsolution()"
+
+        return cmd
+
+    def get_circuit_properties(self, circuit_name):
+        """Used primarily to obtain impedance information associated with circuit properties.
+        Properties are returned for the circuit property named "circuit".
+        Three values are returned by the function. In order, these results are"""
+
+        if self.field not in fields:
+            raise ValueError("The physical field is not defined!")
+
+        if self.field == kw_magnetic:
+            cmd = Template("result = mo_getcircuitproperties($circuit)")
+
+        return cmd.substitute(circuit="'" + circuit_name + "'")
 
 
 class FemmExecutor:

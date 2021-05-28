@@ -4,7 +4,9 @@ from adze_modeler.femm_wrapper import FemmWriter
 from adze_modeler.femm_wrapper import kw_current_flow
 from adze_modeler.femm_wrapper import kw_electrostatic
 from adze_modeler.femm_wrapper import kw_heat_flow
+from adze_modeler.femm_wrapper import MagneticDirichlet
 from adze_modeler.femm_wrapper import MagneticMaterial
+from adze_modeler.femm_wrapper import MagneticMixed
 
 
 class FemmTester(TestCase):
@@ -160,17 +162,17 @@ class FemmTester(TestCase):
         self.assertEqual("ei_deleteselectedsegments", fmw.delete_selected_segments())
 
     def test_delete_selected_arc_segments(self):
-        self.assertEqual("mi_deleteselectedarcsegments", FemmWriter().delete_delete_selected_arc_segments())
+        self.assertEqual("mi_deleteselectedarcsegments", FemmWriter().delete_selected_arc_segments())
 
         fmw = FemmWriter()
         fmw.field = kw_current_flow
-        self.assertEqual("ci_deleteselectedarcsegments", fmw.delete_delete_selected_arc_segments())
+        self.assertEqual("ci_deleteselectedarcsegments", fmw.delete_selected_arc_segments())
 
         fmw.field = kw_heat_flow
-        self.assertEqual("hi_deleteselectedarcsegments", fmw.delete_delete_selected_arc_segments())
+        self.assertEqual("hi_deleteselectedarcsegments", fmw.delete_selected_arc_segments())
 
         fmw.field = kw_electrostatic
-        self.assertEqual("ei_deleteselectedarcsegments", fmw.delete_delete_selected_arc_segments())
+        self.assertEqual("ei_deleteselectedarcsegments", fmw.delete_selected_arc_segments())
 
     def test_clear_seelcted(self):
         self.assertEqual("mi_clearselected()", FemmWriter().clear_selected())
@@ -210,6 +212,9 @@ class FemmTester(TestCase):
 
         fmw.field = kw_electrostatic
         self.assertEqual("ei_selectnode(1.0, 1.0)", fmw.select_node(1.0, 1.0))
+
+    def test_select_node(self):
+        self.assertEqual("mi_selectarcsegment(1.0, 1.0)", FemmWriter().select_arc_segment(1.0, 1.0))
 
     def test_select_label(self):
         self.assertEqual("mi_selectlabel(1.0, 1.0)", FemmWriter().select_label(1.0, 1.0))
@@ -277,7 +282,42 @@ class FemmTester(TestCase):
         self.assertEqual('mi_addcircprop("test",1,0)', FemmWriter().add_circprop("test", 1, 0))
 
     def test_add_material(self):
-
         coil = MagneticMaterial("coil", 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)
 
-        self.assertEqual("mi_addmaterial(coil, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)", FemmWriter().add_material(coil))
+        self.assertEqual(
+            "mi_addmaterial('coil', 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0)", FemmWriter().add_material(coil)
+        )
+
+    def test_add_boundary(self):
+        # mi_addboundprop('abc', 0, 0, 0, 0, 0, 0, 1 / (r * 0.0254 * pi * 4.e-7), 0, 2);
+
+        # dirichlet boundary condition
+        dirichlet_boundary = MagneticDirichlet("dirichlet", 1, 2, 3, 4)
+        self.assertEqual(
+            "mi_addboundprop('dirichlet', 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0)",
+            FemmWriter().add_boundary(dirichlet_boundary),
+        )
+
+        # mixed boundary condition
+        mixed_boundary = MagneticMixed("mixed_test", 1, 2)
+        self.assertEqual(
+            "mi_addboundprop('mixed_test', 0, 0, 0, 0, 0, 0, 1, 2, 2, 0, 0)", FemmWriter().add_boundary(mixed_boundary)
+        )
+
+    def test_block_prop(self):
+        self.assertEqual(
+            "mi_setblockprop('coil', 0, 0.05, 'icoil', 0, 0, 100)",
+            FemmWriter().set_blockprop("coil", 0.05, "icoil", 0, 0, 100),
+        )
+
+    def test_setarcsegment(self):
+        self.assertEqual("mi_setarcsegmentprop(5, 'abc', 0, 0)", FemmWriter().set_arc_segment_prop(5, "abc", 0, 0))
+
+    def test_run_analysis(self):
+        self.assertEqual("mi_analyze(1)", FemmWriter().analyze())
+
+    def test_save_as_command(self):
+        self.assertEqual('mi_saveas("test")', FemmWriter().save_as("test"))
+
+    def test_get_circuit_name(self):
+        self.assertEqual("result = mo_getcircuitproperties('icoil')", FemmWriter().get_circuit_properties("icoil"))
