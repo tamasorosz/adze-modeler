@@ -113,9 +113,19 @@ class TestFemmWriterWithExecutor(unittest.TestCase):
         writer.lua_model.append(writer.save_as("test.fem"))
         writer.lua_model.append(writer.analyze())
         writer.lua_model.append(writer.load_solution())
-        result = writer.lua_model.append(writer.get_circuit_properties("icoil"))
+        writer.lua_model.append(writer.get_circuit_properties("icoil", result='current, volt, flux'))
+        writer.lua_model.append(writer.write_out_result("current", 'current'))
+        writer.lua_model.append(writer.write_out_result("volt", 'volt'))
+        writer.lua_model.append(writer.write_out_result("flux", 'flux'))
 
         # print(writer.lua_model)
+        writer.lua_model.extend(writer.close())
 
         writer.write("test.lua")
         FemmExecutor().run_femm("test.lua")
+
+        with open('femm_data.csv') as f:
+            content = f.readlines()
+            print(content[2])
+            flux = content[2].split(',')
+            self.assertEqual(round(float(flux[1]), 4), 0.0006)

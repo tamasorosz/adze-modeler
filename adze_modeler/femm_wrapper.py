@@ -87,6 +87,18 @@ class FemmWriter:
         cmd_list.append(f'remove("{out_file}")')  # get rid of the old data file, if it exists
         cmd_list.append("newdocument(0)")  # the 0 specifies a magnetics problem
         # cmd_list.append("mi_hidegrid()")
+        cmd = Template("file_out = openfile(\"$outfile\", \"w\")")
+        cmd = cmd.substitute(outfile=out_file)
+        cmd_list.append(cmd)
+        return cmd_list
+
+    def close(self, out_file="femm_data.csv"):
+
+        cmd_list = []
+        cmd_list.append("closefile(file_out)")
+        cmd_list.append("mo_close()")
+        cmd_list.append("mi_close()")
+        cmd_list.append("quit()")
 
         return cmd_list
 
@@ -727,18 +739,25 @@ class FemmWriter:
 
         return cmd
 
-    def get_circuit_properties(self, circuit_name):
+    def get_circuit_properties(self, circuit_name, result='current, volt, flux'):
         """Used primarily to obtain impedance information associated with circuit properties.
         Properties are returned for the circuit property named "circuit".
-        Three values are returned by the function. In order, these results are"""
+        Three values are returned by the function.
+
+        In order, these results are current, volt and flux of the circuit."""
 
         if self.field not in fields:
             raise ValueError("The physical field is not defined!")
 
         if self.field == kw_magnetic:
-            cmd = Template("result = mo_getcircuitproperties($circuit)")
+            cmd = Template("$result = mo_getcircuitproperties($circuit)")
 
-        return cmd.substitute(circuit="'" + circuit_name + "'")
+        return cmd.substitute(circuit="'" + circuit_name + "'", result=result)
+
+    def write_out_result(self, key, value):
+        # writes out a key_value pair
+        cmd = Template('write(file_out, \'$key\', \', \', $value, "\{}") \n'.format('n'))
+        return cmd.substitute(key=key, value=value)
 
 
 class FemmExecutor:
